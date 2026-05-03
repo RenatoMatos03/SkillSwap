@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/widgets.dart';
+import 'recover_password_page.dart';
+import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,7 +30,6 @@ class _LoginPageState extends State<LoginPage> {
                     Image.asset(
                       'assets/skill_swap_logo.png',
                       height: 190,
-                      fit: BoxFit.contain,
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -70,7 +71,10 @@ class _LoginPageState extends State<LoginPage> {
                     Center(
                       child: TextButton(
                         onPressed: () {
-                          // Navegar para Recuperar Password
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const RecoverPasswordPage()),
+                          );
                         },
                         child: const Text(
                           "Esqueceste-te da password?",
@@ -87,12 +91,29 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Não tens conta? "),
-                  GestureDetector(
-                    onTap: () {},
+                  const Text(
+                    "Não tens conta? ",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RegisterPage()),
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero, // Remove o padding interno do botão
+                      minimumSize: const Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      foregroundColor: const Color(0xFF009191), // Cor do texto ao clicar
+                    ),
                     child: const Text(
                       "Registar",
-                      style: TextStyle(color: Color(0xFF009191), fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],
