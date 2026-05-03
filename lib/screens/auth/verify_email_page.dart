@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../widgets/widgets.dart';
+import 'personal_data_page.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   final String email; // Recebe o email da tela anterior
@@ -98,6 +99,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   onPressed: () {
                     String code = _controllers.map((e) => e.text).join();
                     print("Código inserido: $code");
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PersonalDataPage()),
+                    );
                   },
                 ),
                 const SizedBox(height: 20),

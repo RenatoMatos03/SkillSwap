@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/widgets.dart';
 import 'recover_password_page.dart';
 import 'register_page.dart';
+import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -63,7 +64,10 @@ class _LoginPageState extends State<LoginPage> {
                     AuthButton(
                       text: "Login",
                       onPressed: () {
-                        // Lógica de login
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomePage()),
+                        );
                       },
                     ),
 
