@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../quiz/quiz_home_view.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -16,7 +18,7 @@ class _HomePageState extends State<HomePage> {
     const Center(child: Text("Match Content")),
     const Center(child: Text("Mensagens Content")),
     const Center(child: Text("Fórum Content")),
-    const Center(child: Text("Quiz Content")),
+    const QuizHomeView(),
   ];
 
   @override
