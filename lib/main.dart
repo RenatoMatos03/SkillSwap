@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/auth/login_page.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
+  // É obrigatório adicionar esta linha antes de usar o SystemChrome no main()
+  WidgetsFlutterBinding.ensureInitialized(); 
+
+  // Ocultar as barras de cima e de baixo (Modo Imersivo)
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   // Garante que o Flutter está pronto antes de inicializar o Firebase
   WidgetsFlutterBinding.ensureInitialized();
   
