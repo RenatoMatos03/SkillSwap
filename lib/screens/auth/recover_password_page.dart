@@ -1,22 +1,54 @@
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/widgets.dart';
-import 'change_password_page.dart';
 
-class RecoverPasswordPage extends StatelessWidget {
+class RecoverPasswordPage extends StatefulWidget {
   const RecoverPasswordPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<RecoverPasswordPage> createState() => _RecoverPasswordPageState();
+}
 
-    // 1. Cria o controller para capturar o texto
-    final TextEditingController _emailController = TextEditingController();
+class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
+  final _emailController = TextEditingController();
+  final _authService = AuthService();
 
-    // 2. Função para validar email (Regex básica)
-    bool _isEmailValid(String email) {
-      return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(email);
+  bool _isLoading = false;
+  bool _emailSent = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendReset() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      setState(() => _errorMessage = 'Por favor, introduza o seu email.');
+      return;
     }
 
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await _authService.sendPasswordReset(email);
+      if (!mounted) return;
+      setState(() => _emailSent = true);
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -27,7 +59,6 @@ class RecoverPasswordPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -43,7 +74,7 @@ class RecoverPasswordPage extends StatelessWidget {
                           Text(
                             "Voltar ao Login",
                             style: TextStyle(
-                              color: Colors.grey, 
+                              color: Colors.grey,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -53,9 +84,7 @@ class RecoverPasswordPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 40),
-                
                 Center(
                   child: Container(
                     width: 120,
@@ -68,24 +97,21 @@ class RecoverPasswordPage extends StatelessWidget {
                           color: const Color(0xFF009191).withOpacity(0.1),
                           blurRadius: 40,
                           spreadRadius: 5,
-                        )
+                        ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.email_outlined,
+                    child: Icon(
+                      _emailSent ? Icons.mark_email_read_outlined : Icons.email_outlined,
                       size: 60,
-                      color: Color(0xFF009191),
+                      color: const Color(0xFF009191),
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 40),
-                
-                // Título e Descrição
-                const Center(
+                Center(
                   child: Text(
-                    "Recuperar Password",
-                    style: TextStyle(
+                    _emailSent ? "Email Enviado!" : "Recuperar Password",
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1D204B),
@@ -96,61 +122,61 @@ class RecoverPasswordPage extends StatelessWidget {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: RichText(
+                    child: Text(
+                      _emailSent
+                          ? "Enviámos um link para ${_emailController.text.trim()}. Verifica a tua caixa de correio e segue as instruções."
+                          : "Indica o teu email e enviamos um link para recuperares a password.",
                       textAlign: TextAlign.center,
-                      text: const TextSpan(
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                        children: [
-                          TextSpan(text: "Indique-nos o seu "),
-                          TextSpan(
-                            text: "EMAIL",
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-                          ),
-                          TextSpan(text: " para enviar uma nova password."),
-                        ],
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 16, height: 1.5),
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 50),
-                
-                AuthCard(
-                  child: Column(
-                    children: [
-                      AuthTextField(
-                        label: "Email",
-                        hintText: "2024146666@estudantes.ips.pt",
-                        controller: _emailController,
-                      ),
-                      const SizedBox(height: 30),
-                      AuthButton(
-                        text: "Enviar",
-                        onPressed: () {
-                          String email = _emailController.text.trim();
-
-                          if (email.isEmpty) {
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Por favor, introduza o seu email.")),
-                            );
-                          } else if (!_isEmailValid(email)) {
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Introduza um formato de email válido.")),
-                            );
-                          } else {
-                            
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const ChangePasswordPage()),
-                            );
-                          }
-                        },
-                      ),
-                    ],
+                if (!_emailSent) ...[
+                  AuthCard(
+                    child: Column(
+                      children: [
+                        AuthTextField(
+                          label: "Email",
+                          hintText: "2024146666@estudantes.ips.pt",
+                          controller: _emailController,
+                        ),
+                        if (_errorMessage != null) ...[
+                          const SizedBox(height: 14),
+                          Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: Colors.red, fontSize: 13),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                        const SizedBox(height: 30),
+                        AuthButton(
+                          text: _isLoading ? "A enviar..." : "Enviar",
+                          onPressed: _isLoading ? null : _sendReset,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ] else ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF009191),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        "Voltar ao Login",
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
               ],
             ),

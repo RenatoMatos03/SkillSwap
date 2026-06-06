@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/widgets.dart';
 import 'recover_password_page.dart';
 import 'register_page.dart';
@@ -12,7 +13,43 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _authService = AuthService();
+
   bool _obscurePassword = true;
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await _authService.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +61,6 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             children: [
               const SizedBox(height: 80),
-              // Logo e Título
               Center(
                 child: Column(
                   children: [
@@ -41,43 +77,53 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 50),
-              
+
               AuthCard(
                 child: Column(
                   children: [
                     AuthTextField(
                       label: "Email institucional",
                       hintText: "2024146666@estudantes.ips.pt",
+                      controller: _emailController,
                     ),
                     const SizedBox(height: 20),
                     AuthTextField(
                       label: "Password",
                       hintText: "********",
                       obscureText: _obscurePassword,
+                      controller: _passwordController,
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () =>
+                            setState(() => _obscurePassword = !_obscurePassword),
                       ),
                     ),
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 14),
+                      Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                     const SizedBox(height: 30),
-                    
                     AuthButton(
-                      text: "Login",
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomePage()),
-                        );
-                      },
+                      text: _isLoading ? "A entrar..." : "Login",
+                      onPressed: _isLoading ? null : _login,
                     ),
-
                     const SizedBox(height: 16),
                     Center(
                       child: TextButton(
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const RecoverPasswordPage()),
+                            MaterialPageRoute(
+                              builder: (context) => const RecoverPasswordPage(),
+                            ),
                           );
                         },
                         child: const Text(
@@ -90,8 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 40),
-              
-              // Link para Registo
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -103,14 +148,16 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const RegisterPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
+                        ),
                       );
                     },
                     style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero, // Remove o padding interno do botão
+                      padding: EdgeInsets.zero,
                       minimumSize: const Size(0, 0),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      foregroundColor: const Color(0xFF009191), // Cor do texto ao clicar
+                      foregroundColor: const Color(0xFF009191),
                     ),
                     child: const Text(
                       "Registar",
