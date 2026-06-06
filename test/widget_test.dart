@@ -18,7 +18,7 @@ void main() {
     await tester.tap(loginButton);
     await tester.pumpAndSettle();
 
-    expect(find.text('Home Content'), findsOneWidget);
+    expect(find.text('Olá, Maria Rodrigues 👋'), findsOneWidget);
 
     await tester.tap(find.text('Quiz'));
     await tester.pumpAndSettle();
