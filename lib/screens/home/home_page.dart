@@ -11,6 +11,7 @@ import '../../widgets/home_news_card.dart';
 import 'home_mock_data.dart';
 import 'home_models.dart';
 import '../forum/forum_schools_page.dart';
+import '../swipe/swipe_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const SizedBox.shrink(),
-    const Center(child: Text('Match Content')),
+    SwipePage(),
     const Center(child: Text('Mensagens Content')),
     ForumSchoolsPage(),
     const QuizHomeView(),
