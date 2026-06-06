@@ -33,6 +33,17 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         primaryColor: const Color(0xFF009191),
       ),
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: const ScrollBehavior().copyWith(
+            // Altera a física de scroll de TODA a app. 
+            // O BouncingScrollPhysics dá um salto suave sem deformar a imagem.
+            // (Se quiseres que pare totalmente a seco, muda para ClampingScrollPhysics() )
+            physics: const BouncingScrollPhysics(),
+          ),
+          child: child!,
+        );
+      },
       home: const LoginPage(),
     );
   }

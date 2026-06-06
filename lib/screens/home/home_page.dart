@@ -10,6 +10,7 @@ import '../../widgets/home_leaderboard_card.dart';
 import '../../widgets/home_news_card.dart';
 import 'home_mock_data.dart';
 import 'home_models.dart';
+import '../forum/forum_schools_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,12 +36,12 @@ class _HomePageState extends State<HomePage> {
   final List<NewsItem> _newsItems = homeNewsItems;
   final List<LeaderboardItem> _leaderboardItems = homeLeaderboardItems;
 
-  final List<Widget> _pages = const [
-    SizedBox.shrink(),
-    Center(child: Text('Match Content')),
-    Center(child: Text('Mensagens Content')),
-    Center(child: Text('Fórum Content')),
-    QuizHomeView(),
+  final List<Widget> _pages = [
+    const SizedBox.shrink(),
+    const Center(child: Text('Match Content')),
+    const Center(child: Text('Mensagens Content')),
+    ForumSchoolsPage(),
+    const QuizHomeView(),
   ];
 
   @override
