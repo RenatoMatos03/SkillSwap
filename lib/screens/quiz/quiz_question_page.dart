@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'quiz_models.dart';
 import 'quiz_result_page.dart';
+import '../../widgets/quiz/quiz_widgets.dart';
 
 class QuizQuestionPage extends StatefulWidget {
   final List<QuizQuestion> questions;
@@ -22,10 +23,7 @@ class _QuizQuestionPageState extends State<QuizQuestionPage> {
 
   void _handlePrimaryAction() {
     if (!_answered) {
-      if (_selectedOptionIndex == null) {
-        return;
-      }
-
+      if (_selectedOptionIndex == null) return;
       setState(() {
         _answered = true;
         if (_currentQuestion.options[_selectedOptionIndex!].isCorrect) {
@@ -131,205 +129,24 @@ class _QuizQuestionPageState extends State<QuizQuestionPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0xFFE6EAEE)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1F4F5),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              'PERGUNTA $currentQuestionNumber',
-                              style: const TextStyle(
-                                color: Color(0xFF6B7280),
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.6,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _currentQuestion.prompt,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1D204B),
-                              height: 1.35,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE0F2F1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              _currentQuestion.category,
-                              style: const TextStyle(
-                                color: Color(0xFF009191),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    QuizQuestionCard(
+                      question: _currentQuestion,
+                      questionNumber: currentQuestionNumber,
                     ),
                     const SizedBox(height: 18),
                     ...List.generate(_currentQuestion.options.length, (index) {
-                      final option = _currentQuestion.options[index];
-                      final bool isSelected = _selectedOptionIndex == index;
-                      final bool isCorrect = option.isCorrect;
-                      final bool showAnsweredState = _answered;
-
-                      Color borderColor = const Color(0xFFE3E8EF);
-                      Color backgroundColor = Colors.white;
-                      Color textColor = const Color(0xFF1D204B);
-                      Color badgeColor = const Color(0xFFF1F4F5);
-                      Color badgeTextColor = const Color(0xFF4B5563);
-                      Widget? trailingIcon;
-
-                      if (showAnsweredState) {
-                        if (isCorrect) {
-                          backgroundColor = const Color(0xFFE6F7F6);
-                          borderColor = const Color(0xFF009191);
-                          textColor = const Color(0xFF005B5B);
-                          badgeColor = const Color(0xFF009191);
-                          badgeTextColor = Colors.white;
-                          trailingIcon = const Icon(Icons.check_circle, color: Color(0xFF009191), size: 22);
-                        } else if (isSelected) {
-                          backgroundColor = const Color(0xFFFFECEC);
-                          borderColor = const Color(0xFFE25555);
-                          textColor = const Color(0xFFB42318);
-                          badgeColor = const Color(0xFFE25555);
-                          badgeTextColor = Colors.white;
-                          trailingIcon = const Icon(Icons.close_rounded, color: Color(0xFFE25555), size: 22);
-                        } else {
-                          backgroundColor = const Color(0xFFF8FAFC);
-                          textColor = const Color(0xFF98A2B3);
-                        }
-                      } else if (isSelected) {
-                        borderColor = const Color(0xFF009191);
-                        backgroundColor = const Color(0xFFE9F7F7);
-                        textColor = const Color(0xFF0F766E);
-                        badgeColor = const Color(0xFF009191);
-                        badgeTextColor = Colors.white;
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: InkWell(
-                          onTap: _answered ? null : () => setState(() => _selectedOptionIndex = index),
-                          borderRadius: BorderRadius.circular(16),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: backgroundColor,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: borderColor, width: 1.2),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 28,
-                                  height: 28,
-                                  decoration: BoxDecoration(
-                                    color: badgeColor,
-                                    borderRadius: BorderRadius.circular(9),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      option.letter,
-                                      style: TextStyle(
-                                        color: badgeTextColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    option.text,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.35,
-                                    ),
-                                  ),
-                                ),
-                                if (trailingIcon != null) trailingIcon,
-                              ],
-                            ),
-                          ),
-                        ),
+                      return QuizOptionCard(
+                        option: _currentQuestion.options[index],
+                        isSelected: _selectedOptionIndex == index,
+                        isAnswered: _answered,
+                        onTap: _answered ? null : () => setState(() => _selectedOptionIndex = index),
                       );
                     }),
                     if (_answered) ...[
                       const SizedBox(height: 4),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: _currentQuestion.options[_selectedOptionIndex ?? 0].isCorrect
-                              ? const Color(0xFFE6F7F6)
-                              : const Color(0xFFFFF0F0),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: _currentQuestion.options[_selectedOptionIndex ?? 0].isCorrect
-                                ? const Color(0xFF009191)
-                                : const Color(0xFFE25555),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              _currentQuestion.options[_selectedOptionIndex ?? 0].isCorrect
-                                  ? Icons.check_circle_outline
-                                  : Icons.error_outline,
-                              color: _currentQuestion.options[_selectedOptionIndex ?? 0].isCorrect
-                                  ? const Color(0xFF009191)
-                                  : const Color(0xFFE25555),
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                _currentQuestion.options[_selectedOptionIndex ?? 0].isCorrect
-                                    ? 'Correto! Muito bem.'
-                                    : 'Incorreto. A resposta correta é a opção ${_currentQuestion.options.firstWhere((option) => option.isCorrect).letter}.',
-                                style: TextStyle(
-                                  color: _currentQuestion.options[_selectedOptionIndex ?? 0].isCorrect
-                                      ? const Color(0xFF005B5B)
-                                      : const Color(0xFFB42318),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      QuizFeedbackBanner(
+                        isCorrect: _currentQuestion.options[_selectedOptionIndex!].isCorrect,
+                        correctLetter: _currentQuestion.options.firstWhere((o) => o.isCorrect).letter,
                       ),
                     ],
                   ],
@@ -350,7 +167,9 @@ class _QuizQuestionPageState extends State<QuizQuestionPage> {
                     elevation: 0,
                   ),
                   child: Text(
-                    _answered ? 'Próxima Pergunta +' : 'Confirmar Resposta',
+                    _answered
+                        ? (_currentIndex == widget.questions.length - 1 ? 'Ver Resultado' : 'Próxima Pergunta')
+                        : 'Confirmar Resposta',
                     style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
