@@ -12,6 +12,9 @@ class UserProfile {
   final List<String> tagsOferta;
   final int coins;
   final int streak;
+  final String phoneNumber;
+  final String photoUrl;
+  final double rating;
 
   UserProfile({
     required this.uid,
@@ -25,6 +28,9 @@ class UserProfile {
     required this.tagsOferta,
     this.coins = 0,
     this.streak = 0,
+    this.phoneNumber = '',
+    this.photoUrl = '',
+    this.rating = 0.0,
   });
 
   factory UserProfile.fromMap(String uid, Map<String, dynamic> map) {
@@ -40,6 +46,9 @@ class UserProfile {
       tagsOferta: List<String>.from(map['tagsOferta'] ?? []),
       coins: map['coins'] ?? 0,
       streak: map['streak'] ?? 0,
+      phoneNumber: map['phoneNumber'] ?? '',
+      photoUrl: map['photoUrl'] ?? '',
+      rating: (map['rating'] ?? 0).toDouble(),
     );
   }
 
@@ -55,6 +64,9 @@ class UserProfile {
       'tagsOferta': tagsOferta,
       'coins': coins,
       'streak': streak,
+      'phoneNumber': phoneNumber,
+      'photoUrl': photoUrl,
+      'rating': rating,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }

@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MatchPage extends StatefulWidget {
-  final String
-  phoneNumber; // Recebe o número do aluno em quem demos Swipe para cima
+  final String phoneNumber;
 
   const MatchPage({super.key, required this.phoneNumber});
 
@@ -25,18 +24,21 @@ class _MatchPageState extends State<MatchPage> {
   Future<void> _openWhatsAppAfterDelay() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    // O link universal para abrir o WhatsApp diretamente numa conversa
-    final Uri whatsappUrl = Uri.parse("https://wa.me/${widget.phoneNumber}");
+    //Remove os espaços e o sinal de "+" se existirem na base de dados
+    String cleanNumber = widget.phoneNumber
+        .replaceAll('+', '')
+        .replaceAll(' ', '');
+
+    final Uri whatsappUrl = Uri.parse("https://wa.me/$cleanNumber");
 
     if (await canLaunchUrl(whatsappUrl)) {
       await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
     } else {
-      // Mostra um erro se o telemóvel/emulador não tiver o WhatsApp instalado
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Não foi possível abrir o WhatsApp.')),
         );
-        Navigator.pop(context); // Volta atrás se falhar
+        Navigator.pop(context);
       }
     }
   }
@@ -44,7 +46,7 @@ class _MatchPageState extends State<MatchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF009191), // O vosso verde/teal principal
+      backgroundColor: const Color(0xFF009191),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

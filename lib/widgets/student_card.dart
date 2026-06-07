@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
-import '../models/swipe/student_profile.dart';
+import '../models/user_profile.dart';
 
 class StudentCard extends StatelessWidget {
-  final StudentProfile profile;
+  final UserProfile profile;
 
   const StudentCard({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
+    String dominaText = profile.tagsOferta.isNotEmpty
+        ? profile.tagsOferta.join(', ')
+        : 'Ainda não definiu';
+
+    String precisaText = profile.tagsProcura.isNotEmpty
+        ? profile.tagsProcura.join(', ')
+        : 'Ainda não definiu';
+
     return Stack(
       children: [
         // Imagem de Fundo
         Positioned.fill(
-          child: Image.asset(
-            profile.imagePath,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              color: Colors.grey[800],
-              child: const Center(
-                child: Text(
-                  "Sem Imagem",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ),
+          child: profile.photoUrl.isNotEmpty
+              ? Image.network(
+                  profile.photoUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => _buildNoImage(),
+                )
+              : _buildNoImage(),
         ),
 
         // Gradiente Escuro
@@ -67,7 +69,7 @@ class StudentCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
-                          profile.rating.toString(),
+                          profile.rating.toStringAsFixed(1), // Ex: 4.0
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -77,6 +79,7 @@ class StudentCard extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: 8),
+
               Text(
                 profile.name,
                 style: const TextStyle(
@@ -86,11 +89,13 @@ class StudentCard extends StatelessWidget {
                 ),
               ),
               Text(
-                profile.course,
+                "${profile.course} - ${profile.academicYear}",
                 style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
               const SizedBox(height: 16),
+
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     "DOMINA: ",
@@ -100,14 +105,17 @@ class StudentCard extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  Text(
-                    profile.domina,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  Expanded(
+                    child: Text(
+                      dominaText,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     "PRECISA: ",
@@ -117,9 +125,11 @@ class StudentCard extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  Text(
-                    profile.precisa,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  Expanded(
+                    child: Text(
+                      precisaText,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                   ),
                 ],
               ),
@@ -127,6 +137,22 @@ class StudentCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildNoImage() {
+    return Container(
+      color: Colors.grey[800],
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.person, size: 80, color: Colors.white54),
+            SizedBox(height: 8),
+            Text("Sem Imagem", style: TextStyle(color: Colors.white54)),
+          ],
+        ),
+      ),
     );
   }
 }
