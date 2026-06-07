@@ -36,9 +36,6 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return ScrollConfiguration(
           behavior: const ScrollBehavior().copyWith(
-            // Altera a física de scroll de TODA a app. 
-            // O BouncingScrollPhysics dá um salto suave sem deformar a imagem.
-            // (Se quiseres que pare totalmente a seco, muda para ClampingScrollPhysics() )
             physics: const BouncingScrollPhysics(),
           ),
           child: child!,

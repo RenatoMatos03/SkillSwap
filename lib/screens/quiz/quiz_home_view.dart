@@ -1,11 +1,44 @@
 import 'package:flutter/material.dart';
 
-import 'quiz_models.dart';
+import '../../models/quiz_models.dart';
 import 'quiz_question_page.dart';
+import '../../services/quiz_service.dart';
 import '../../widgets/quiz/quiz_widgets.dart';
 
-class QuizHomeView extends StatelessWidget {
+class QuizHomeView extends StatefulWidget {
   const QuizHomeView({super.key});
+
+  @override
+  State<QuizHomeView> createState() => _QuizHomeViewState();
+}
+
+class _QuizHomeViewState extends State<QuizHomeView> {
+  final _quizService = QuizService();
+
+  List<QuizQuestion>? _questions;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadQuestions();
+  }
+
+  Future<void> _loadQuestions() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final questions = await _quizService.fetchQuestions();
+      if (mounted) setState(() => _questions = questions);
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +76,7 @@ class QuizHomeView extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             const Text(
-              'Bases de Dados',
+              'Informática',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 28,
@@ -53,48 +86,75 @@ class QuizHomeView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Semana 21 · 04 de Maio 2026',
+              'Perguntas sobre Computação e Tecnologia',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 26),
             const Row(
               children: [
-                Expanded(child: QuizStatCard(icon: Icons.timer_outlined, value: '10 min', label: 'Duração')),
-                SizedBox(width: 10),
                 Expanded(child: QuizStatCard(icon: Icons.quiz_outlined, value: '10', label: 'Questões')),
                 SizedBox(width: 10),
-                Expanded(child: QuizStatCard(icon: Icons.signal_cellular_alt, value: '1-10', label: 'Nível')),
+                Expanded(child: QuizStatCard(icon: Icons.monetization_on_outlined, value: '10', label: 'Coins')),
+                SizedBox(width: 10),
+                Expanded(child: QuizStatCard(icon: Icons.signal_cellular_alt, value: 'Misto', label: 'Nível')),
               ],
             ),
             const SizedBox(height: 22),
             const Text(
-              'Testa os teus conhecimentos sobre SQL,\nnormalização, transações e modelação de bases de dados.',
+              'Testa os teus conhecimentos sobre programação,\nredes, bases de dados e sistemas operativos.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Color(0xFF5F6368), fontSize: 14, height: 1.5),
             ),
             const SizedBox(height: 28),
+            if (_error != null) ...[
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.red, fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+            ],
             SizedBox(
               width: double.infinity,
               height: 54,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuizQuestionPage(questions: sampleQuizQuestions),
-                    ),
-                  );
-                },
+                onPressed: _isLoading
+                    ? null
+                    : _error != null
+                        ? _loadQuestions
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    QuizQuestionPage(questions: _questions!),
+                              ),
+                            );
+                          },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF009191),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  disabledBackgroundColor: const Color(0xFFD6DBE0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Iniciar Quiz',
-                  style: TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold),
-                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.5,
+                        ),
+                      )
+                    : Text(
+                        _error != null ? 'Tentar novamente' : 'Iniciar Quiz',
+                        style: const TextStyle(
+                            fontSize: 17,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
               ),
             ),
             const SizedBox(height: 18),

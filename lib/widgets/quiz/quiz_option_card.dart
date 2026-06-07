@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../screens/quiz/quiz_models.dart';
+import '../../models/quiz_models.dart';
 
 class QuizOptionCard extends StatelessWidget {
   final QuizOption option;

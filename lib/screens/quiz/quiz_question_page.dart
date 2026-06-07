@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'quiz_models.dart';
+import '../../models/quiz_models.dart';
 import 'quiz_result_page.dart';
 import '../../widgets/quiz/quiz_widgets.dart';
 
