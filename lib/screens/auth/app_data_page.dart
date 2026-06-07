@@ -1,17 +1,36 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../models/user_profile.dart';
+import '../../services/user_service.dart';
 import '../../widgets/widgets.dart';
 import '../home/home_page.dart';
 
 class AppDataPage extends StatefulWidget {
-  const AppDataPage({super.key});
+  final String name;
+  final DateTime birthDate;
+  final String school;
+  final String course;
+  final String academicYear;
+
+  const AppDataPage({
+    super.key,
+    required this.name,
+    required this.birthDate,
+    required this.school,
+    required this.course,
+    required this.academicYear,
+  });
 
   @override
   State<AppDataPage> createState() => _AppDataPageState();
 }
 
 class _AppDataPageState extends State<AppDataPage> {
-  final List<String> _tagsProcura = ["Matemática I", "POO", "PW2"];
-  final List<String> _tagsOferta = ["IPM", "CM"];
+  final _userService = UserService();
+  bool _isLoading = false;
+
+  final List<String> _tagsProcura = [];
+  final List<String> _tagsOferta = [];
 
   final TextEditingController _procuraController = TextEditingController();
   final TextEditingController _ofertaController = TextEditingController();
@@ -106,13 +125,38 @@ class _AppDataPageState extends State<AppDataPage> {
                 const SizedBox(height: 30),
 
                 AuthButton(
-                  text: "Finalizar ✓",
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
-                      (route) => false, // Isto remove todas as telas anteriores (registo, dados, etc)
-                    );
+                  text: _isLoading ? "A guardar..." : "Finalizar ✓",
+                  onPressed: _isLoading ? null : () async {
+                    setState(() => _isLoading = true);
+                    try {
+                      final uid = FirebaseAuth.instance.currentUser!.uid;
+                      final email = FirebaseAuth.instance.currentUser!.email!;
+                      final profile = UserProfile(
+                        uid: uid,
+                        email: email,
+                        name: widget.name,
+                        birthDate: widget.birthDate,
+                        school: widget.school,
+                        course: widget.course,
+                        academicYear: widget.academicYear,
+                        tagsProcura: _tagsProcura,
+                        tagsOferta: _tagsOferta,
+                      );
+                      await _userService.saveUserProfile(profile);
+                      if (!mounted) return;
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                        (route) => false,
+                      );
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(e.toString())),
+                      );
+                    } finally {
+                      if (mounted) setState(() => _isLoading = false);
+                    }
                   },
                 ),
                 

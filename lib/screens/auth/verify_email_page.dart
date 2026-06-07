@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/widgets.dart';
 import 'personal_data_page.dart';
 
 class VerifyEmailPage extends StatefulWidget {
-  final String email; // Recebe o email da tela anterior
+  final String email;
 
   const VerifyEmailPage({super.key, required this.email});
 
@@ -13,19 +13,51 @@ class VerifyEmailPage extends StatefulWidget {
 }
 
 class _VerifyEmailPageState extends State<VerifyEmailPage> {
-  
-  final List<TextEditingController> _controllers = List.generate(5, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(5, (_) => FocusNode());
+  final _authService = AuthService();
 
-  @override
-  void dispose() {
-    for (var node in _focusNodes) {
-      node.dispose();
+  bool _isChecking = false;
+  bool _isResending = false;
+  String? _errorMessage;
+
+  Future<void> _checkVerified() async {
+    setState(() {
+      _isChecking = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final verified = await _authService.checkEmailVerified();
+      if (!mounted) return;
+
+      if (verified) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PersonalDataPage()),
+        );
+      } else {
+        setState(() => _errorMessage = 'Email ainda não verificado. Clica no link que enviámos.');
+      }
+    } finally {
+      if (mounted) setState(() => _isChecking = false);
     }
-    for (var controller in _controllers) {
-      controller.dispose();
+  }
+
+  Future<void> _resendEmail() async {
+    setState(() => _isResending = true);
+    try {
+      await _authService.sendEmailVerification();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email reenviado! Verifica a tua caixa de correio.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      if (mounted) setState(() => _isResending = false);
     }
-    super.dispose();
   }
 
   @override
@@ -39,7 +71,6 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
             child: Column(
               children: [
                 const SizedBox(height: 60),
-                // Ícone da Carta
                 Center(
                   child: Container(
                     width: 120,
@@ -48,19 +79,28 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                       color: const Color(0xFFE0F2F1).withOpacity(0.6),
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: const Icon(Icons.email_outlined, size: 60, color: Color(0xFF009191)),
+                    child: const Icon(
+                      Icons.mark_email_unread_outlined,
+                      size: 60,
+                      color: Color(0xFF009191),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
                 const Text(
-                  "Confirmar Email",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF1D204B)),
+                  "Confirma o teu Email",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1D204B),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                const Text("Foi enviado um código via e-mail:", style: TextStyle(color: Colors.grey, fontSize: 16)),
+                const Text(
+                  "Enviámos um link de verificação para:",
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
                 const SizedBox(height: 10),
-                
-                // Email dinâmico vindo da tela anterior
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
@@ -69,44 +109,54 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   ),
                   child: Text(
                     widget.email,
-                    style: const TextStyle(color: Color(0xFF008B8B), fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Color(0xFF008B8B),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 40),
-
-                // Campos para inserir o código (5 dígitos)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(5, (index) => _otpInput(index)),
+                const SizedBox(height: 16),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    'Abre o email e clica no link. Depois volta aqui e prime "Já verifiquei".',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 14, height: 1.5),
+                  ),
                 ),
-
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 20),
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 13),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
                 const SizedBox(height: 40),
-                
-                // Reenviar Código
+                AuthButton(
+                  text: _isChecking ? "A verificar..." : "Já verifiquei",
+                  onPressed: _isChecking ? null : _checkVerified,
+                ),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Não recebeste o código? ", style: TextStyle(color: Colors.grey)),
+                    const Text(
+                      "Não recebeste o email? ",
+                      style: TextStyle(color: Colors.grey),
+                    ),
                     TextButton(
-                      onPressed: () {},
-                      child: const Text("Reenviar", style: TextStyle(color: Color(0xFF009191), fontWeight: FontWeight.bold)),
+                      onPressed: _isResending ? null : _resendEmail,
+                      child: Text(
+                        _isResending ? "A reenviar..." : "Reenviar",
+                        style: const TextStyle(
+                          color: Color(0xFF009191),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
-                AuthButton(
-                  text: "Confirmar",
-                  onPressed: () {
-                    String code = _controllers.map((e) => e.text).join();
-                    print("Código inserido: $code");
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const PersonalDataPage()),
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.arrow_back, size: 16, color: Colors.grey),
@@ -115,53 +165,6 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _otpInput(int index) {
-    return Container(
-      height: 80,
-      width: 65,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          )
-        ],
-      ),
-      
-      child: Center(
-        child: TextField(
-          controller: _controllers[index],
-          focusNode: _focusNodes[index],
-          textAlign: TextAlign.center,
-          keyboardType: TextInputType.number,
-          maxLength: 1,
-          style: const TextStyle(
-            fontSize: 32, 
-            fontWeight: FontWeight.bold,
-            height: 1,
-          ),
-          decoration: const InputDecoration(
-            counterText: "", 
-            border: InputBorder.none,
-            
-            contentPadding: EdgeInsets.zero, 
-          ),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onChanged: (value) {
-            if (value.isNotEmpty && index < 4) {
-              _focusNodes[index + 1].requestFocus();
-            } else if (value.isEmpty && index > 0) {
-              _focusNodes[index - 1].requestFocus();
-            }
-          },
         ),
       ),
     );

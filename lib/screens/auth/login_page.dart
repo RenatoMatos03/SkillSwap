@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../services/user_service.dart';
 import '../../widgets/widgets.dart';
 import 'recover_password_page.dart';
 import 'register_page.dart';
+import 'verify_email_page.dart';
+import 'personal_data_page.dart';
 import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService();
+  final _userService = UserService();
 
   bool _obscurePassword = true;
   bool _isLoading = false;
@@ -40,6 +44,33 @@ class _LoginPageState extends State<LoginPage> {
         _passwordController.text,
       );
       if (!mounted) return;
+
+      final emailVerified = await _authService.checkEmailVerified();
+      if (!mounted) return;
+
+      if (!emailVerified) {
+        await _authService.sendEmailVerification();
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerifyEmailPage(email: _emailController.text.trim()),
+          ),
+        );
+        return;
+      }
+
+      final hasProfile = await _userService.profileExists();
+      if (!mounted) return;
+
+      if (!hasProfile) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PersonalDataPage()),
+        );
+        return;
+      }
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),

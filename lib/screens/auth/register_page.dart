@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/widgets.dart';
 import 'verify_email_page.dart';
 
@@ -10,13 +11,15 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _authService = AuthService();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -24,6 +27,37 @@ class _RegisterPageState extends State<RegisterPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _register() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() => _errorMessage = 'As passwords não coincidem.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await _authService.register(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      await _authService.sendEmailVerification();
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VerifyEmailPage(email: _emailController.text.trim()),
+        ),
+      );
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -36,21 +70,10 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             children: [
               const SizedBox(height: 60),
-              
               Center(
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/skill_swap_logo.png',
-                      height: 190,
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
+                child: Image.asset('assets/skill_swap_logo.png', height: 190),
               ),
-
               const SizedBox(height: 40),
-
               AuthCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,14 +87,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       style: TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                     const SizedBox(height: 30),
-                    
                     AuthTextField(
                       label: "Email institucional",
                       hintText: "2024146666@estudantes.ips.pt",
                       controller: _emailController,
                     ),
                     const SizedBox(height: 20),
-                    
                     AuthTextField(
                       label: "Password",
                       hintText: "********",
@@ -83,7 +104,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    
                     AuthTextField(
                       label: "Confirmar Password",
                       hintText: "********",
@@ -94,35 +114,23 @@ class _RegisterPageState extends State<RegisterPage> {
                         onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                       ),
                     ),
-                    
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 14),
+                      Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                     const SizedBox(height: 40),
-                    
                     AuthButton(
-                      text: "Registar",
-                      onPressed: () {
-                        
-                        if (_passwordController.text != _confirmPasswordController.text) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("As passwords não coincidem!")),
-                          );
-                        } else {
-                          print("Registo efetuado!");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VerifyEmailPage(email: _emailController.text),
-                            ),
-                          );
-                        }
-                      },
+                      text: _isLoading ? "A registar..." : "Registar",
+                      onPressed: _isLoading ? null : _register,
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 40),
-
-              // Link para Login
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

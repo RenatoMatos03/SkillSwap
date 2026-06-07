@@ -30,6 +30,19 @@ class AuthService {
     }
   }
 
+  Future<void> sendEmailVerification() async {
+    try {
+      await _auth.currentUser?.sendEmailVerification();
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthError(e);
+    }
+  }
+
+  Future<bool> checkEmailVerified() async {
+    await _auth.currentUser?.reload();
+    return _auth.currentUser?.emailVerified ?? false;
+  }
+
   Future<void> sendPasswordReset(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);

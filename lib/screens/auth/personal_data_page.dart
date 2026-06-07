@@ -10,15 +10,44 @@ class PersonalDataPage extends StatefulWidget {
 }
 
 class _PersonalDataPageState extends State<PersonalDataPage> {
-  // Valores selecionados para os dropdowns
-  String? selectedEscola;
-  String? selectedCurso;
-  String? selectedAno;
+  final _nameController = TextEditingController();
+  final _escolaController = TextEditingController();
+  final _cursoController = TextEditingController();
+  final _anoController = TextEditingController();
 
-  // Listas de dados
-  final List<String> escolas = ["Tecnologia de Setúbal", "Educação", "Ciências Empresariais"];
-  final List<String> cursos = ["Licenciatura em Engenharia Informática", "Design de Comunicação", "Gestão"];
-  final List<String> anos = ["1º Ano", "2º Ano", "3º Ano", "4º Ano", "5º Ano"];
+  DateTime? _selectedDate;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _escolaController.dispose();
+    _cursoController.dispose();
+    _anoController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2003),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(primary: Color(0xFF009191)),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) setState(() => _selectedDate = picked);
+  }
+
+  String get _formattedDate {
+    if (_selectedDate == null) return '';
+    return '${_selectedDate!.day.toString().padLeft(2, '0')}/'
+        '${_selectedDate!.month.toString().padLeft(2, '0')}/'
+        '${_selectedDate!.year}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +61,6 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
-                
                 Row(
                   children: [
                     Expanded(
@@ -56,9 +84,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 30),
-                
                 const Text(
                   "PASSO 1 DE 2",
                   style: TextStyle(
@@ -81,64 +107,99 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                   "Preenche as informações do teu perfil académico.",
                   style: TextStyle(color: Colors.grey, fontSize: 15),
                 ),
-                
                 const SizedBox(height: 30),
-                
                 AuthCard(
                   child: Column(
                     children: [
-                      const AuthTextField(
+                      AuthTextField(
                         label: "Nome",
                         hintText: "Renato Matos",
+                        controller: _nameController,
                       ),
                       const SizedBox(height: 20),
-                      const AuthTextField(
-                        label: "Data de Nascimento",
-                        hintText: "08/04/2003",
+                      // Date picker
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Data de Nascimento",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: _pickDate,
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF2F5F7),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.calendar_today_outlined, size: 18, color: Colors.grey),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    _selectedDate == null ? "Selecionar data" : _formattedDate,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: _selectedDate == null ? Colors.grey : Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 20),
-                      
-                      AuthDropdown(
+                      AuthTextField(
                         label: "Escola",
-                        hintText: "Selecionar Escola",
-                        items: escolas,
-                        value: selectedEscola,
-                        onChanged: (val) => setState(() => selectedEscola = val),
+                        hintText: "Ex: Tecnologia de Setúbal",
+                        controller: _escolaController,
                       ),
                       const SizedBox(height: 20),
-                      
-                      AuthDropdown(
+                      AuthTextField(
                         label: "Curso",
-                        hintText: "Selecionar Curso",
-                        items: cursos,
-                        value: selectedCurso,
-                        onChanged: (val) => setState(() => selectedCurso = val),
+                        hintText: "Ex: Engenharia Informática",
+                        controller: _cursoController,
                       ),
                       const SizedBox(height: 20),
-                      
-                      // Dropdown Ano Escolar usando o widget abstrato
-                      AuthDropdown(
+                      AuthTextField(
                         label: "Ano Escolar",
-                        hintText: "Selecionar Ano",
-                        items: anos,
-                        value: selectedAno,
-                        onChanged: (val) => setState(() => selectedAno = val),
+                        hintText: "Ex: 2º Ano",
+                        controller: _anoController,
                       ),
                     ],
                   ),
                 ),
-                
                 const SizedBox(height: 30),
-                
-                // Botão Avançar
                 SizedBox(
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
                     onPressed: () {
+                      if (_nameController.text.trim().isEmpty ||
+                          _selectedDate == null ||
+                          _escolaController.text.trim().isEmpty ||
+                          _cursoController.text.trim().isEmpty ||
+                          _anoController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Preenche todos os campos.')),
+                        );
+                        return;
+                      }
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const AppDataPage()),
+                        MaterialPageRoute(
+                          builder: (context) => AppDataPage(
+                            name: _nameController.text.trim(),
+                            birthDate: _selectedDate!,
+                            school: _escolaController.text.trim(),
+                            course: _cursoController.text.trim(),
+                            academicYear: _anoController.text.trim(),
+                          ),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
