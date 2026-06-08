@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../models/forum/question.dart';
 import '../../widgets/forum/widgets_forum.dart';
-import '../../widgets/widgets.dart';
+import '../../widgets/widgets.dart'; // Para os AuthButton e custom tags se estiverem aqui
 
 class ForumCreateQuestionPage extends StatefulWidget {
   const ForumCreateQuestionPage({super.key});
@@ -11,10 +12,23 @@ class ForumCreateQuestionPage extends StatefulWidget {
 
 class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
   final TextEditingController _tagController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
+  
   final List<String> _tags = [];
+  final List<Map<String, dynamic>> _attachments = []; // Lista vazia para simular anexos
   bool _isAnonymous = false;
 
-  void _addTag(String tag) {
+  @override
+  void dispose() {
+    _tagController.dispose();
+    _titleController.dispose();
+    _descController.dispose();
+    super.dispose();
+  }
+
+  void _addTag() {
+    final tag = _tagController.text;
     if (tag.trim().isNotEmpty && !_tags.contains(tag.trim())) {
       setState(() {
         _tags.add(tag.trim());
@@ -29,62 +43,96 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
     });
   }
 
+  // Simula a adição de um anexo ao clicar nos botões
+  void _addMockAttachment(String type) {
+    setState(() {
+      if (type == 'Imagem') {
+        _attachments.add({"icon": Icons.image, "color": Colors.teal, "title": "captura_ecra.png", "subtitle": "PNG · 800 KB"});
+      } else if (type == 'Ficheiro') {
+        _attachments.add({"icon": Icons.picture_as_pdf, "color": Colors.redAccent, "title": "documento_apoio.pdf", "subtitle": "PDF · 1.5 MB"});
+      } else if (type == 'Código') {
+        _attachments.add({"icon": Icons.code, "color": Colors.blueGrey, "title": "script.sql", "subtitle": "SQL · 12 KB"});
+      }
+    });
+  }
+
+  void _removeAttachment(int index) {
+    setState(() {
+      _attachments.removeAt(index);
+    });
+  }
+
+  void _publishQuestion() {
+    // Validação simples
+    if (_titleController.text.trim().isEmpty || _descController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor, preenche o título e a descrição.", style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    // Cria a nova pergunta
+    final newQuestion = Question(
+      title: _titleController.text.trim(),
+      description: _descController.text.trim(),
+      status: "Aberta",
+      userName: _isAnonymous ? "Anónimo" : "Maria Rodrigues", // Simula o utilizador atual
+      userInitials: _isAnonymous ? "A" : "MR",
+      userCourse: _isAnonymous ? "Anónimo" : "LEIC",
+      commentsCount: 0,
+      timeAgo: "agora",
+      tags: List.from(_tags),
+    );
+
+    // Devolve a pergunta para a página anterior
+    Navigator.pop(context, newQuestion);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar REMOVIDO DAQUI
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // NOVO CABEÇALHO ADICIONADO AQUI
             const ForumPageHeader(title: "Nova Pergunta"),
 
             const Text("TAGS DA PERGUNTA", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                ..._tags.map((tag) => Chip(
-                  label: Text(tag, style: const TextStyle(color: Color(0xFF009191), fontSize: 12)),
-                  backgroundColor: const Color(0xFFE0F2F1),
-                  deleteIcon: const Icon(Icons.close, size: 16, color: Color(0xFF009191)),
-                  onDeleted: () => _removeTag(tag),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide.none),
-                )),
-                SizedBox(
-                  width: 150,
-                  child: TextField(
-                    controller: _tagController,
-                    onSubmitted: _addTag,
-                    decoration: InputDecoration(
-                      hintText: _tags.isEmpty ? "Ex: Base de Dados..." : "+ Adicionar tag",
-                      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
-                      filled: true,
-                      fillColor: const Color(0xFFF2F5F7),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    ),
-                  ),
-                ),
-              ],
+            
+            CustomTagInputField(
+              controller: _tagController,
+              hintText: "Ex: Base de Dados...",
+              onAdd: _addTag,
             ),
+            const SizedBox(height: 16),
+            
+            if (_tags.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _tags.map((tag) => CustomTagChip(
+                  label: tag,
+                  onRemove: () => _removeTag(tag),
+                )).toList(),
+              ),
+            
             const SizedBox(height: 24),
 
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("TÍTULO / PERGUNTA", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-                Text("0/120", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                const Text("TÍTULO / PERGUNTA", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                Text("${_titleController.text.length}/120", style: const TextStyle(fontSize: 10, color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 8),
             TextField(
+              controller: _titleController,
               maxLength: 120,
+              onChanged: (text) => setState(() {}), // Para atualizar o contador
               decoration: InputDecoration(
                 hintText: "Qual é a tua dúvida? (sê específico)",
                 counterText: "",
@@ -98,6 +146,7 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             const Text("DESCRIÇÃO", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 8),
             TextField(
+              controller: _descController,
               maxLines: 6,
               decoration: InputDecoration(
                 hintText: "Descreve o teu problema em detalhe, inclui o que já tentaste...",
@@ -122,12 +171,14 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Publicar anonimamente", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text("O teu nome não será visível para os outros utilizadores.", style: TextStyle(color: Colors.grey, fontSize: 10)),
-                  ],
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Publicar anonimamente", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      Text("O teu nome não será visível para os outros utilizadores.", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                    ],
+                  ),
                 )
               ],
             ),
@@ -137,36 +188,39 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildAttachmentButton(Icons.image, "Imagem"),
+                GestureDetector(onTap: () => _addMockAttachment('Imagem'), child: _buildAttachmentButton(Icons.image, "Imagem")),
                 const SizedBox(width: 8),
-                _buildAttachmentButton(Icons.attach_file, "Ficheiro"),
+                GestureDetector(onTap: () => _addMockAttachment('Ficheiro'), child: _buildAttachmentButton(Icons.attach_file, "Ficheiro")),
                 const SizedBox(width: 8),
-                _buildAttachmentButton(Icons.code, "Código", isSelected: false),
+                GestureDetector(onTap: () => _addMockAttachment('Código'), child: _buildAttachmentButton(Icons.code, "Código")),
               ],
             ),
             const SizedBox(height: 16),
             
-            AttachedFileCard(
-              icon: Icons.image,
-              iconColor: Colors.teal,
-              title: "diagrama_er.png",
-              subtitle: "PNG · 1.2 MB",
-              trailingWidget: const Icon(Icons.close, size: 18, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            AttachedFileCard(
-              icon: Icons.picture_as_pdf,
-              iconColor: Colors.redAccent,
-              title: "Slides_03_Normalizacao.pdf",
-              subtitle: "PDF · 2.4 MB",
-              trailingWidget: const Icon(Icons.close, size: 18, color: Colors.grey),
-            ),
+            // Desenha a lista de anexos dinamicamente se existirem
+            ..._attachments.asMap().entries.map((entry) {
+              int idx = entry.key;
+              var att = entry.value;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: AttachedFileCard(
+                  icon: att["icon"],
+                  iconColor: att["color"],
+                  title: att["title"],
+                  subtitle: att["subtitle"],
+                  trailingWidget: GestureDetector(
+                    onTap: () => _removeAttachment(idx),
+                    child: const Icon(Icons.close, size: 18, color: Colors.grey),
+                  ),
+                ),
+              );
+            }),
             
             const SizedBox(height: 40),
 
             AuthButton(
               text: "Publicar Pergunta",
-              onPressed: () {},
+              onPressed: _publishQuestion, // Chama a nossa função de publicar!
             ),
             const Center(
               child: Padding(
@@ -180,23 +234,19 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
     );
   }
 
-  Widget _buildAttachmentButton(IconData icon, String label, {bool isSelected = true}) {
+  Widget _buildAttachmentButton(IconData icon, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFE0F2F1) : Colors.transparent,
-        border: Border.all(color: isSelected ? const Color(0xFF009191) : Colors.grey[300]!),
+        color: Colors.transparent,
+        border: Border.all(color: Colors.grey[300]!),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 14, color: isSelected ? const Color(0xFF009191) : Colors.grey),
+          Icon(icon, size: 14, color: Colors.grey),
           const SizedBox(width: 6),
-          Text(label, style: TextStyle(color: isSelected ? const Color(0xFF009191) : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
-          if (isSelected) ...[
-             const SizedBox(width: 4),
-             const Icon(Icons.check, size: 12, color: Color(0xFF009191)),
-          ]
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
         ],
       ),
     );

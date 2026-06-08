@@ -3,7 +3,7 @@ import '../../models/forum/question.dart';
 import 'widgets_forum.dart';
 
 class QuestionFullBody extends StatelessWidget {
-  final Question question; // <--- RECEBE A PERGUNTA AQUI
+  final Question question;
 
   const QuestionFullBody({super.key, required this.question});
 
@@ -12,77 +12,29 @@ class QuestionFullBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildQuestionHeader(),
-        const SizedBox(height: 16),
-        _buildQuestionContent(),
-      ],
-    );
-  }
-
-  Widget _buildQuestionHeader() {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundColor: const Color(0xFF009191),
-          // <--- ALTERADO: Iniciais dinâmicas
-          child: Text(question.userInitials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  // <--- ALTERADO: Nome de utilizador dinâmico
-                  Text(question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(width: 8),
-                  // <--- ALTERADO: Curso do utilizador dinâmico em vez de LEIC-D
-                  CustomBadge(text: question.userCourse, textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withOpacity(0.1)),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  // <--- ALTERADO: Estado da pergunta dinâmico
-                  CustomBadge(
-                    text: question.status, 
-                    textColor: question.status == "Resolvida" ? const Color(0xFF009191) : Colors.grey[700]!, 
-                    bgColor: question.status == "Resolvida" ? const Color(0xFFE0F2F1) : Colors.grey[200]!, 
-                    icon: question.status == "Resolvida" ? Icons.check_circle : Icons.circle_outlined
-                  ),
-                  const SizedBox(width: 8),
-                  // <--- ALTERADO: Tempo de publicação dinâmico
-                  Text("há ${question.timeAgo}", style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                ],
-              )
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuestionContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
         Text(
-          question.title, // <--- ALTERADO: Título dinâmico da pergunta clicada
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1D204B)),
+          question.title,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1D204B), height: 1.3),
         ),
-        const SizedBox(height: 16),
-        Text(
-          question.description, // <--- ALTERADO: Descrição dinâmica da pergunta clicada
-          textAlign: TextAlign.justify, 
-          style: const TextStyle(
-            fontSize: 14, 
-            color: Color(0xFF4F4F4F), 
-            height: 1.6,
+        const SizedBox(height: 12),
+        if (question.tags.isNotEmpty) 
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: question.tags.map((tag) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(color: const Color(0xFFF2F5F7), borderRadius: BorderRadius.circular(6)),
+              child: Text("#$tag", style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+            )).toList(),
           ),
-        ),
         const SizedBox(height: 16),
+        // A descrição não tem limites de linhas (maxLines), logo ocupa o espaço que precisar
+        Text(
+          question.description,
+          textAlign: TextAlign.justify,
+          style: const TextStyle(fontSize: 14, color: Color(0xFF4F4F4F), height: 1.6),
+        ),
+        const SizedBox(height: 20),
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Container(
@@ -155,7 +107,7 @@ class QuestionFullBody extends StatelessWidget {
             ),
             child: const Text("Ver", style: TextStyle(fontSize: 12, color: Colors.black)),
           ),
-        )
+        ),
       ],
     );
   }
