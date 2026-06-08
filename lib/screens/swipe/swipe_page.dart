@@ -55,12 +55,10 @@ class _SwipePageState extends State<SwipePage> {
 
       final matchedUsers = allUsers.where((otherUser) {
         if (otherUser.uid == myUid) return false;
-
         if (myNeedsNormalized.isEmpty) return false;
 
         bool hasMatch = otherUser.tagsOferta.any((tagDeles) {
           String tagNormalizada = tagDeles.trim().toLowerCase();
-
           return myNeedsNormalized.contains(tagNormalizada);
         });
 
@@ -85,23 +83,22 @@ class _SwipePageState extends State<SwipePage> {
     double dy = details.velocity.pixelsPerSecond.dy;
 
     if (dy < -velocityThreshold && dy.abs() > dx.abs()) {
-      // SWIPE PARA CIMA -> Abre a MatchPage e passa o número de telemóvel real
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              MatchPage(phoneNumber: _profiles[_currentIndex].phoneNumber),
-        ),
-      );
+      if (_currentIndex < _profiles.length) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                MatchPage(phoneNumber: _profiles[_currentIndex].phoneNumber),
+          ),
+        );
+      }
     } else if (dx > velocityThreshold) {
-      // SWIPE PARA A DIREITA -> Próximo cartão
       setState(() {
-        if (_currentIndex < _profiles.length - 1) {
+        if (_currentIndex < _profiles.length) {
           _currentIndex++;
         }
       });
     } else if (dx < -velocityThreshold) {
-      // SWIPE PARA A ESQUERDA -> Cartão anterior
       setState(() {
         if (_currentIndex > 0) {
           _currentIndex--;
@@ -113,7 +110,7 @@ class _SwipePageState extends State<SwipePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF009191)),
@@ -122,7 +119,7 @@ class _SwipePageState extends State<SwipePage> {
           ? const Center(
               child: Text(
                 "Não há estudantes compatíveis no momento.",
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: Colors.black87, fontSize: 16),
               ),
             )
           : GestureDetector(
@@ -130,11 +127,37 @@ class _SwipePageState extends State<SwipePage> {
               behavior: HitTestBehavior.opaque,
               child: Stack(
                 children: [
-                  // O Cartão final pronto a ser avaliado!
-                  StudentCard(profile: _profiles[_currentIndex]),
+                  _currentIndex >= _profiles.length
+                      ? _buildEndOfListMessage()
+                      : StudentCard(profile: _profiles[_currentIndex]),
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildEndOfListMessage() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check_circle_outline, size: 80, color: Color(0xFF009191)),
+          SizedBox(height: 16),
+          Text(
+            "Chegaste ao fim!",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            "Viste todos os estudantes compatíveis.",
+            style: TextStyle(color: Colors.black54, fontSize: 16),
+          ),
+        ],
+      ),
     );
   }
 }
