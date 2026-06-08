@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/comment_model.dart';
+import '../../models/forum/question.dart';
 import '../../widgets/forum/widgets_forum.dart';
 
 class ForumQuestionDetailsPage extends StatefulWidget {
-  const ForumQuestionDetailsPage({super.key});
+  final Question question;
+
+  const ForumQuestionDetailsPage({super.key, required this.question});
 
   @override
   State<ForumQuestionDetailsPage> createState() => _ForumQuestionDetailsPageState();
@@ -13,10 +16,9 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
   final FocusNode _commentFocusNode = FocusNode();
   final TextEditingController _commentController = TextEditingController();
   
-  // ESTADOS NOVOS:
-  bool _isQuestionOwner = true; // Simulação: O user atual é o dono desta pergunta!
-  bool _sortDescending = true;  // Começa do mais votado para o menos votado
-  CommentModel? _replyingTo;    // Guarda o comentário a que estamos a responder
+  bool _isQuestionOwner = true; 
+  bool _sortDescending = true;  
+  CommentModel? _replyingTo;    
 
   @override
   void initState() {
@@ -36,24 +38,19 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
 
   final List<CommentModel> _commentsTree = [
     CommentModel(
-      id: "1", userName: "Ana Ferreira", userInitials: "AF", badge: "LEIC-D", time: "há 2h", votes: 12, isSolution: true,
-      text: "Para normalizar até à 3FN, segue estes 3 passos: 1FN — Todos os atributos devem ser atómicos, sem grupos repetitivos nem tabelas dentro de tabelas. 2FN — Elimina dependências parciais; cada atributo não-chave deve depender da chave primária completa (só relevante quando a chave é composta). 3FN — Elimina dependências transitivas; atributos não-chave não podem depender de outros atributos não-chave. Exemplo prático: na tabela Encomenda(IdEncomenda, IdProduto, NomeProduto, Quantidade), o NomeProduto depende apenas do IdProduto — viola a 2FN. Separa para uma tabela Produto separada!",
+      id: "1", userName: "Ana Ferreira", userInitials: "AF", badge: "LSIRC", time: "há 2h", votes: 12, isSolution: true,
+      text: "Para normalizar até à 3FN, segue estes 3 passos: 1FN — Todos os atributos devem ser atómicos, sem grupos repetitivos nem tabelas dentro de tabelas. 2FN — Elimina dependências parciais; cada atributo não-chave deve depender da chave primária completa. 3FN — Elimina dependências transitivas.",
       replies: [
         CommentModel(
-          id: "1.1", userName: "Miguel Ramos", userInitials: "MR", badge: "LEIC-D", time: "há 2h", votes: 3,
-          text: "Obrigado Ana! Ficou muito mais claro com o exemplo da tabela Encomenda. Era exactamente isso que não estava a perceber — confundia dependência parcial com transitiva.",
-          replies: [
-            CommentModel(
-              id: "1.1.1", userName: "Ana Ferreira", userInitials: "AF", badge: "LEIC-D", time: "há 1h", votes: 1,
-              text: "Ainda bem que ajudou! Qualquer dúvida sobre as formas normais, apita.",
-            )
-          ]
+          id: "1.1", userName: "Miguel Ramos", userInitials: "MR", badge: "LEIC", time: "há 2h", votes: 3,
+          text: "Obrigado Ana! Ficou muito mais claro com o exemplo da tabela Encomenda.",
+          replies: []
         ),
       ],
     ),
     CommentModel(
-      id: "2", userName: "João Costa", userInitials: "JC", badge: "LEIC-D", time: "há 4h", votes: 8,
-      text: "Complementando o que a Ana disse, uma forma de memorizar é o \"juramento\": cada atributo não-chave deve depender \"da chave, toda a chave, e nada mais que a chave\". Esse nada mais que a chave é exactamente a 3FN. Simples mas eficaz para o exame!",
+      id: "2", userName: "João Costa", userInitials: "JC", badge: "LME", time: "há 4h", votes: 8,
+      text: "Complementando o que a Ana disse, uma forma de memorizar é o 'juramento': cada atributo não-chave deve depender da chave, toda a chave, e nada mais que a chave.",
     ),
   ];
 
@@ -64,7 +61,6 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
     super.dispose();
   }
 
-  // Acionado quando clicas no botão "Responder" de um comentário
   void _focusInputForReply(CommentModel comment) {
     setState(() {
       _replyingTo = comment;
@@ -72,7 +68,6 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
     _commentFocusNode.requestFocus();
   }
 
-  // Inverte a ordem dos comentários principais
   void _toggleSort() {
     setState(() {
       _sortDescending = !_sortDescending;
@@ -88,7 +83,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       userName: "Tu (Eu)",
       userInitials: "TU",
-      badge: "LEIC-T",
+      badge: "LEIC",
       time: "agora",
       votes: 0,
       text: text,
@@ -112,16 +107,22 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    String tagsTitle = widget.question.tags.isNotEmpty 
+        ? widget.question.tags.map((t) => "#$t").join("   ") 
+        : "Detalhes";
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const ForumAppBar(title: "Base de Dados"),
       body: Column(
         children: [
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
-                const QuestionFullBody(),
+                ForumPageHeader(title: tagsTitle),
+
+                QuestionFullBody(question: widget.question),
+                
                 const SizedBox(height: 32),
                 _buildCommentsHeader(),
                 const SizedBox(height: 16),
@@ -129,7 +130,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                 ..._commentsTree.map((comment) => CommentItem(
                   comment: comment,
                   onReply: _focusInputForReply,
-                  isQuestionOwner: _isQuestionOwner, // Informa se o user é o dono
+                  isQuestionOwner: _isQuestionOwner,
                   onSolutionToggled: () {
                     setState(() {
                       _sortComments();
@@ -159,7 +160,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
       children: [
         Text("Comentários (${_commentsTree.length})", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1D204B))),
         InkWell(
-          onTap: _toggleSort, // Clicável para ordenar
+          onTap: _toggleSort,
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: Row(

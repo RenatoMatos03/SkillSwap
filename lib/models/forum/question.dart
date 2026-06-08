@@ -6,6 +6,8 @@ class Question {
   final String userInitials;
   final int commentsCount;
   final String timeAgo;
+  final List<String> tags;
+  final String userCourse; // <--- NOVA PROPRIEDADE
 
   Question({
     required this.title,
@@ -15,5 +17,7 @@ class Question {
     required this.userInitials,
     required this.commentsCount,
     required this.timeAgo,
+    this.tags = const [],
+    required this.userCourse, // <--- ADICIONADO AQUI
   });
 }

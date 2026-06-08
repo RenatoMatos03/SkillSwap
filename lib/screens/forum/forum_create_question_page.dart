@@ -33,13 +33,15 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const ForumAppBar(title: "Nova Pergunta"),
+      // appBar REMOVIDO DAQUI
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- SECÇÃO DAS TAGS ---
+            // NOVO CABEÇALHO ADICIONADO AQUI
+            const ForumPageHeader(title: "Nova Pergunta"),
+
             const Text("TAGS DA PERGUNTA", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 8),
             Wrap(
@@ -53,7 +55,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
                   onDeleted: () => _removeTag(tag),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide.none),
                 )),
-                // Input para a nova tag
                 SizedBox(
                   width: 150,
                   child: TextField(
@@ -74,7 +75,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             ),
             const SizedBox(height: 24),
 
-            // --- TÍTULO ---
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -95,7 +95,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             ),
             const SizedBox(height: 24),
 
-            // --- DESCRIÇÃO ---
             const Text("DESCRIÇÃO", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 8),
             TextField(
@@ -109,7 +108,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             ),
             const SizedBox(height: 24),
 
-            // --- PUBLICAR ANONIMAMENTE ---
             Row(
               children: [
                 SizedBox(
@@ -135,7 +133,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             ),
             const SizedBox(height: 24),
 
-            // --- ANEXOS ---
             const Text("ANEXOS (OPCIONAL)", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 12),
             Row(
@@ -149,7 +146,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             ),
             const SizedBox(height: 16),
             
-            // Ficheiros anexados (Simulação Visual)
             AttachedFileCard(
               icon: Icons.image,
               iconColor: Colors.teal,
@@ -168,16 +164,13 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             
             const SizedBox(height: 40),
 
-            // --- BOTÃO DE PUBLICAR ---
-            // REUTILIZADO: AuthButton original 
             AuthButton(
               text: "Publicar Pergunta",
               onPressed: () {},
             ),
-            // Pequeno subtítulo abaixo do botão
             const Center(
               child: Padding(
-                padding: EdgeInsets.only(top: 8.0),
+                padding: EdgeInsets.only(top: 8.0, bottom: 30.0),
                 child: Text("custa 2 moedas", style: TextStyle(color: Colors.grey, fontSize: 12)),
               ),
             ),

@@ -24,6 +24,9 @@ class _HomePageState extends State<HomePage> {
   final PageController _newsPageController = PageController(viewportFraction: 0.92);
   final _userService = UserService();
 
+  // Chave para controlar a navegação exclusiva do Fórum
+  final GlobalKey<NavigatorState> _forumNavigatorKey = GlobalKey<NavigatorState>();
+
   UserProfile? _profile;
 
   @override
@@ -57,14 +60,6 @@ class _HomePageState extends State<HomePage> {
   final List<NewsItem> _newsItems = homeNewsItems;
   final List<LeaderboardItem> _leaderboardItems = homeLeaderboardItems;
 
-  final List<Widget> _pages = [
-    const SizedBox.shrink(),
-    SwipePage(),
-    const Center(child: Text('Mensagens Content')),
-    ForumSchoolsPage(),
-    const QuizHomeView(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +71,8 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: AppColors.cardBackground,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: AppColors.textPrimary),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -96,7 +93,23 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(width: 8),
         ],
       ),
-      body: _selectedIndex == 0 ? _buildHomeContent() : _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          _buildHomeContent(),
+          SwipePage(),
+          const Center(child: Text('Mensagens Content')),
+          Navigator(
+            key: _forumNavigatorKey,
+            onGenerateRoute: (settings) {
+              return MaterialPageRoute(
+                builder: (context) => ForumSchoolsPage(),
+              );
+            },
+          ),
+          const QuizHomeView(),
+        ],
+      ),
       // Navbar Inferior
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

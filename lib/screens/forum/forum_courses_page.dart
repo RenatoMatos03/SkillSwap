@@ -13,7 +13,6 @@ class ForumCoursesPage extends StatefulWidget {
 }
 
 class _ForumCoursesPageState extends State<ForumCoursesPage> {
-  // --- ESTADOS DOS FILTROS E PESQUISA ---
   String _searchQuery = "";
   String _selectedOrder = "Padrão";
   String _selectedGroup = "Sem agrupamento";
@@ -30,10 +29,9 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
   @override
   void initState() {
     super.initState();
-    _displayedCourses = List.from(_allCourses); // Inicialmente mostra todos
+    _displayedCourses = List.from(_allCourses);
   }
 
-  // Lógica principal que aplica os filtros e pesquisa real
   void _applyFilters() {
     List<Course> filtered = _allCourses.where((course) {
       final searchLower = _searchQuery.toLowerCase();
@@ -41,7 +39,6 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
              course.acronym.toLowerCase().contains(searchLower);
     }).toList();
 
-    // Lógica de Ordenação
     if (_selectedOrder == "Alfabético A-Z") {
       filtered.sort((a, b) => a.acronym.compareTo(b.acronym));
     } else if (_selectedOrder == "Alfabético Z-A") {
@@ -52,7 +49,6 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
       filtered.sort((a, b) => a.subjectsCount.compareTo(b.subjectsCount));
     }
 
-    // Lógica de Agrupamento (ordena por grupo para juntar itens semelhantes)
     if (_selectedGroup == "Tipo de curso") {
       filtered.sort((a, b) => a.type.compareTo(b.type));
     } else if (_selectedGroup == "Área temática") {
@@ -79,7 +75,6 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
         });
         _applyFilters();
       },
-      // BOTÃO LIMPAR ADICIONADO AQUI
       onClear: () {
         setState(() {
           _selectedOrder = "Padrão";
@@ -121,17 +116,17 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: ForumAppBar(title: widget.schoolName),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
+            ForumPageHeader(title: widget.schoolName), // Cabeçalho fixado no body
             SearchAndFilterBar(
               hintText: "Pesquisar curso...",
               onFilterTap: () => _showFilterModal(context),
               onChanged: (value) {
                 _searchQuery = value;
-                _applyFilters(); // Atualiza a lista a cada letra digitada!
+                _applyFilters();
               },
             ),
             const SizedBox(height: 20),
@@ -150,7 +145,14 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                   itemCount: _displayedCourses.length,
                   itemBuilder: (context, index) => CourseCard(
                     course: _displayedCourses[index], 
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ForumQuestionsPage(subjectName: "Base de Dados"))),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ForumQuestionsPage(subjectName: _displayedCourses[index].acronym),
+                        ),
+                      );
+                    },
                   ),
                 ),
             )

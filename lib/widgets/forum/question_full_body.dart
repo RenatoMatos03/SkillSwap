@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../models/forum/question.dart';
 import 'widgets_forum.dart';
 
 class QuestionFullBody extends StatelessWidget {
-  const QuestionFullBody({super.key});
+  final Question question; // <--- RECEBE A PERGUNTA AQUI
+
+  const QuestionFullBody({super.key, required this.question});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +22,11 @@ class QuestionFullBody extends StatelessWidget {
   Widget _buildQuestionHeader() {
     return Row(
       children: [
-        const CircleAvatar(
+        CircleAvatar(
           radius: 20,
-          backgroundColor: Color(0xFF009191),
-          child: Text("MR", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          backgroundColor: const Color(0xFF009191),
+          // <--- ALTERADO: Iniciais dinâmicas
+          child: Text(question.userInitials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -31,17 +35,26 @@ class QuestionFullBody extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Text("Maria Rodrigues", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  // <--- ALTERADO: Nome de utilizador dinâmico
+                  Text(question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(width: 8),
-                  CustomBadge(text: "LEIC-D", textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withOpacity(0.1)),
+                  // <--- ALTERADO: Curso do utilizador dinâmico em vez de LEIC-D
+                  CustomBadge(text: question.userCourse, textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withOpacity(0.1)),
                 ],
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  CustomBadge(text: "Aberta", textColor: Colors.grey[700]!, bgColor: Colors.grey[200]!, icon: Icons.circle_outlined),
+                  // <--- ALTERADO: Estado da pergunta dinâmico
+                  CustomBadge(
+                    text: question.status, 
+                    textColor: question.status == "Resolvida" ? const Color(0xFF009191) : Colors.grey[700]!, 
+                    bgColor: question.status == "Resolvida" ? const Color(0xFFE0F2F1) : Colors.grey[200]!, 
+                    icon: question.status == "Resolvida" ? Icons.check_circle : Icons.circle_outlined
+                  ),
                   const SizedBox(width: 8),
-                  const Text("12:30", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  // <--- ALTERADO: Tempo de publicação dinâmico
+                  Text("há ${question.timeAgo}", style: const TextStyle(color: Colors.grey, fontSize: 12)),
                 ],
               )
             ],
@@ -55,15 +68,15 @@ class QuestionFullBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Como funciona a normalização até à 3FN em bases de dados relacionais?",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1D204B)),
+        Text(
+          question.title, // <--- ALTERADO: Título dinâmico da pergunta clicada
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1D204B)),
         ),
         const SizedBox(height: 16),
-        const Text(
-          "Estou a estudar para o teste intercalar e tenho dificuldades em perceber os passos de normalização da 1FN até à 3FN. O professor Silvestre explicou na aula mas faltei essa semana.\n\nAlguém consegue explicar de forma clara o que é uma dependência funcional parcial vs uma dependência transitiva? Com um exemplo concreto seria perfeito — já li o livro do Ramakrishnan mas a linguagem é muito densa.\n\nDeixo o diagrama ER do nosso projeto que pode ajudar como contexto, e um bloco de código com a tabela que estou a tentar normalizar.",
+        Text(
+          question.description, // <--- ALTERADO: Descrição dinâmica da pergunta clicada
           textAlign: TextAlign.justify, 
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14, 
             color: Color(0xFF4F4F4F), 
             height: 1.6,
