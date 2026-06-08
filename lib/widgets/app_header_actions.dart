@@ -44,9 +44,15 @@ class AppBalanceChip extends StatelessWidget {
 
 class AppUserAvatar extends StatelessWidget {
   final String initials;
+  final String photoUrl;
   final VoidCallback? onTap;
 
-  const AppUserAvatar({super.key, this.initials = 'RM', this.onTap});
+  const AppUserAvatar({
+    super.key,
+    this.initials = '',
+    this.photoUrl = '',
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +63,14 @@ class AppUserAvatar extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: CircleAvatar(
           backgroundColor: AppColors.primaryDark,
-          child: Text(
-            initials,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-          ),
+          backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+          onBackgroundImageError: photoUrl.isNotEmpty ? (_, __) {} : null,
+          child: photoUrl.isEmpty
+              ? Text(
+                  initials,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                )
+              : null,
         ),
       ),
     );

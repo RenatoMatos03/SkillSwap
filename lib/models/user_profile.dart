@@ -12,6 +12,9 @@ class UserProfile {
   final List<String> tagsOferta;
   final int coins;
   final int streak;
+  final int helpsGiven;
+  final int quizzesDone;
+  final String bio;
   final String phoneNumber;
   final String photoUrl;
   final double rating;
@@ -28,6 +31,9 @@ class UserProfile {
     required this.tagsOferta,
     this.coins = 0,
     this.streak = 0,
+    this.helpsGiven = 0,
+    this.quizzesDone = 0,
+    this.bio = '',
     this.phoneNumber = '',
     this.photoUrl = '',
     this.rating = 0.0,
@@ -46,6 +52,9 @@ class UserProfile {
       tagsOferta: List<String>.from(map['tagsOferta'] ?? []),
       coins: map['coins'] ?? 0,
       streak: map['streak'] ?? 0,
+      helpsGiven: map['helpsGiven'] ?? 0,
+      quizzesDone: map['quizzesDone'] ?? 0,
+      bio: map['bio'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
       photoUrl: map['photoUrl'] ?? '',
       rating: (map['rating'] ?? 0).toDouble(),
@@ -64,6 +73,9 @@ class UserProfile {
       'tagsOferta': tagsOferta,
       'coins': coins,
       'streak': streak,
+      'helpsGiven': helpsGiven,
+      'quizzesDone': quizzesDone,
+      'bio': bio,
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'rating': rating,

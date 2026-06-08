@@ -24,4 +24,28 @@ class UserService {
     if (!doc.exists) return null;
     return UserProfile.fromMap(uid, doc.data()!);
   }
+
+  Future<void> updateProfile({
+    required String uid,
+    String? bio,
+    String? photoUrl,
+    String? phoneNumber,
+    String? school,
+    String? course,
+    String? academicYear,
+    List<String>? tagsOferta,
+    List<String>? tagsProcura,
+  }) async {
+    final data = <String, dynamic>{};
+    if (bio != null) data['bio'] = bio;
+    if (photoUrl != null) data['photoUrl'] = photoUrl;
+    if (phoneNumber != null) data['phoneNumber'] = phoneNumber;
+    if (school != null) data['school'] = school;
+    if (course != null) data['course'] = course;
+    if (academicYear != null) data['academicYear'] = academicYear;
+    if (tagsOferta != null) data['tagsOferta'] = tagsOferta;
+    if (tagsProcura != null) data['tagsProcura'] = tagsProcura;
+    if (data.isEmpty) return;
+    await _db.collection('users').doc(uid).update(data);
+  }
 }

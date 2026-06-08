@@ -8,6 +8,9 @@ import 'home_mock_data.dart';
 import 'home_models.dart';
 import '../forum/forum_schools_page.dart';
 import '../swipe/swipe_page.dart';
+import '../profile/profile_page.dart';
+import '../../utils/string_utils.dart';
+import '../../widgets/profile/profile_widgets.dart';
 import '../../widgets/widgets.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<NavigatorState> _forumNavigatorKey = GlobalKey<NavigatorState>();
 
   UserProfile? _profile;
+  bool _showingProfile = false;
 
   @override
   void initState() {
@@ -38,12 +42,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadProfile() async {
     final profile = await _userService.getUserProfile();
     if (mounted) setState(() => _profile = profile);
-  }
-
-  String _getInitials(String name) {
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
-    return parts.isNotEmpty && parts.first.isNotEmpty ? parts.first[0].toUpperCase() : '?';
   }
 
   String _getStreakText(int streak) {
@@ -87,33 +85,39 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           AppUserAvatar(
-            initials: _getInitials(_profile?.name ?? ''),
+            initials: getInitials(_profile?.name ?? ''),
+            photoUrl: _profile?.photoUrl ?? '',
             onTap: () => _scaffoldKey.currentState?.openDrawer(),
           ),
           const SizedBox(width: 8),
         ],
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          _buildHomeContent(),
-          SwipePage(),
-          const Center(child: Text('Mensagens Content')),
-          Navigator(
-            key: _forumNavigatorKey,
-            onGenerateRoute: (settings) {
-              return MaterialPageRoute(
-                builder: (context) => ForumSchoolsPage(),
-              );
-            },
-          ),
-          const QuizHomeView(),
-        ],
-      ),
+      body: _showingProfile && _profile != null
+          ? ProfilePage(profile: _profile!, onProfileUpdated: _loadProfile)
+          : IndexedStack(
+              index: _selectedIndex,
+              children: [
+                _buildHomeContent(),
+                SwipePage(),
+                const Center(child: Text('Mensagens Content')),
+                Navigator(
+                  key: _forumNavigatorKey,
+                  onGenerateRoute: (settings) {
+                    return MaterialPageRoute(
+                      builder: (context) => ForumSchoolsPage(),
+                    );
+                  },
+                ),
+                const QuizHomeView(),
+              ],
+            ),
       // Navbar Inferior
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        onTap: (index) => setState(() {
+          _selectedIndex = index;
+          _showingProfile = false;
+        }),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF009191),
         unselectedItemColor: Colors.grey,
@@ -266,13 +270,10 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Row(
               children: [
-                CircleAvatar(
+                ProfileAvatar(
+                  name: _profile?.name ?? '',
+                  photoUrl: _profile?.photoUrl ?? '',
                   radius: 30,
-                  backgroundColor: AppColors.primaryDark,
-                  child: Text(
-                    _getInitials(_profile?.name ?? ''),
-                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                  ),
                 ),
                 const SizedBox(width: 15),
                 Expanded(
@@ -307,11 +308,11 @@ class _HomePageState extends State<HomePage> {
           DrawerMenuItem(
             icon: Icons.person_outline,
             title: "Ver Perfil",
-            onTap: () => _showInfoSheet(
-              title: 'Perfil',
-              message:
-                  'A página de perfil ainda não está pronta. Esta opção já responde ao toque.',
-            ),
+            onTap: () {
+              if (_profile == null) return;
+              Navigator.pop(context);
+              setState(() => _showingProfile = true);
+            },
           ),
           _buildLightDivider(),
           DrawerMenuItem(
