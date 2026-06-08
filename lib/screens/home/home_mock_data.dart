@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'home_models.dart';
 
-const HomeUserProfile homeUserProfile = HomeUserProfile(
-  fullName: 'Renato Matos',
-  courseLabel: 'LEI · 2º Ano',
-  initials: 'RM',
-  balance: '100 €',
-  greetingName: 'Maria Rodrigues',
-  streakText: '3 semanas consecutivas de ajuda!',
-);
-
 const List<NewsItem> homeNewsItems = [
   NewsItem(
     tag: 'QUIZ',

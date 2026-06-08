@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-
+import '../../models/user_profile.dart';
+import '../../services/user_service.dart';
 import '../../theme/app_tokens.dart';
-import '../../widgets/app_header_actions.dart';
 import '../quiz/quiz_home_view.dart';
 import 'about_us_page.dart';
-import '../../widgets/drawer_menu_item.dart';
-import '../../widgets/home_greeting_card.dart';
-import '../../widgets/home_leaderboard_card.dart';
-import '../../widgets/home_news_card.dart';
 import 'home_mock_data.dart';
 import 'home_models.dart';
 import '../forum/forum_schools_page.dart';
 import '../swipe/swipe_page.dart';
+import '../../widgets/widgets.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,9 +21,32 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   int _newsIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final PageController _newsPageController = PageController(
-    viewportFraction: 0.92,
-  );
+  final PageController _newsPageController = PageController(viewportFraction: 0.92);
+  final _userService = UserService();
+
+  UserProfile? _profile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await _userService.getUserProfile();
+    if (mounted) setState(() => _profile = profile);
+  }
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    return parts.isNotEmpty && parts.first.isNotEmpty ? parts.first[0].toUpperCase() : '?';
+  }
+
+  String _getStreakText(int streak) {
+    if (streak == 0) return 'Começa hoje a tua streak!';
+    return '$streak semana${streak == 1 ? '' : 's'} consecutiva${streak == 1 ? '' : 's'}!';
+  }
 
   @override
   void dispose() {
@@ -63,15 +83,14 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           AppBalanceChip(
-            value: homeUserProfile.balance,
+            value: '${_profile?.coins ?? 0}',
             onTap: () => _showInfoSheet(
               title: 'Saldo SkillSwap',
-              message:
-                  'Tens 100 € disponíveis para trocar ou usar em funcionalidades futuras.',
+              message: 'Tens ${_profile?.coins ?? 0} coins disponíveis.',
             ),
           ),
           AppUserAvatar(
-            initials: homeUserProfile.initials,
+            initials: _getInitials(_profile?.name ?? ''),
             onTap: () => _scaffoldKey.currentState?.openDrawer(),
           ),
           const SizedBox(width: 8),
@@ -121,8 +140,8 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HomeGreetingCard(
-              greeting: 'Olá, ${homeUserProfile.greetingName} 👋',
-              streakText: homeUserProfile.streakText,
+              greeting: 'Olá, ${_profile?.name.split(' ').first ?? 'utilizador'} 👋',
+              streakText: _getStreakText(_profile?.streak ?? 0),
             ),
             const SizedBox(height: 18),
             Row(
@@ -238,28 +257,31 @@ class _HomePageState extends State<HomePage> {
                   radius: 30,
                   backgroundColor: AppColors.primaryDark,
                   child: Text(
-                    homeUserProfile.initials,
+                    _getInitials(_profile?.name ?? ''),
                     style: const TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
                 const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      homeUserProfile.fullName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _profile?.name ?? '',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      homeUserProfile.courseLabel,
-                      style: const TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                  ],
+                      Text(
+                        _profile != null ? '${_profile!.course} · ${_profile!.academicYear}' : '',
+                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -301,7 +323,7 @@ class _HomePageState extends State<HomePage> {
           _buildLightDivider(),
           DrawerMenuItem(
             icon: Icons.info_outline,
-            title: 'About Us',
+            title: 'Sobre Nós',
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -351,14 +373,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.indicatorInactive,
-                  borderRadius: BorderRadius.circular(99),
-                ),
-              ),
+              const SheetHandle(),
               const SizedBox(height: 16),
               Text(
                 title,
@@ -378,23 +393,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    'Fechar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
+              const SheetCloseButton(),
             ],
           ),
         );
@@ -418,14 +417,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.indicatorInactive,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                ),
+                const SheetHandle(),
                 const SizedBox(height: 16),
                 const Text(
                   'Todas as notícias',
@@ -455,23 +447,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: const Text(
-                      'Fechar',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
+                const SheetCloseButton(),
               ],
             ),
           ),

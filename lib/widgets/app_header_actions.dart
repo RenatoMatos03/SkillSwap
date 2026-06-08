@@ -6,7 +6,7 @@ class AppBalanceChip extends StatelessWidget {
   final String value;
   final VoidCallback? onTap;
 
-  const AppBalanceChip({super.key, this.value = '100 €', this.onTap});
+  const AppBalanceChip({super.key, this.value = '0', this.onTap});
 
   @override
   Widget build(BuildContext context) {

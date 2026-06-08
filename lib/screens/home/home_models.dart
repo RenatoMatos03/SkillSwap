@@ -26,20 +26,3 @@ class LeaderboardItem {
   });
 }
 
-class HomeUserProfile {
-  final String fullName;
-  final String courseLabel;
-  final String initials;
-  final String balance;
-  final String greetingName;
-  final String streakText;
-
-  const HomeUserProfile({
-    required this.fullName,
-    required this.courseLabel,
-    required this.initials,
-    required this.balance,
-    required this.greetingName,
-    required this.streakText,
-  });
-}
