@@ -105,12 +105,69 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
     _commentFocusNode.unfocus();
   }
 
+  // Novo cabeçalho que coloca o Autor na zona do título
+  Widget _buildAuthorHeader() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey[100], 
+                borderRadius: BorderRadius.circular(12)
+              ),
+              child: const Icon(Icons.arrow_back, size: 20, color: Color(0xFF1D204B)),
+            ),
+          ),
+          const SizedBox(width: 16),
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: const Color(0xFF009191),
+            child: Text(widget.question.userInitials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(widget.question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    const SizedBox(width: 8),
+                    CustomBadge(
+                      text: widget.question.userCourse, 
+                      textColor: const Color(0xFF009191), 
+                      bgColor: const Color(0xFF009191).withOpacity(0.1)
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    CustomBadge(
+                      text: widget.question.status, 
+                      textColor: widget.question.status == "Resolvida" ? const Color(0xFF009191) : Colors.grey[700]!, 
+                      bgColor: widget.question.status == "Resolvida" ? const Color(0xFFE0F2F1) : Colors.grey[200]!, 
+                      icon: widget.question.status == "Resolvida" ? Icons.check_circle : Icons.circle_outlined
+                    ),
+                    const SizedBox(width: 8),
+                    Text("há ${widget.question.timeAgo}", style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    String tagsTitle = widget.question.tags.isNotEmpty 
-        ? widget.question.tags.map((t) => "#$t").join("   ") 
-        : "Detalhes";
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -119,7 +176,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
-                ForumPageHeader(title: tagsTitle),
+                _buildAuthorHeader(),
 
                 QuestionFullBody(question: widget.question),
                 

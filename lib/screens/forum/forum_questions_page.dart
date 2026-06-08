@@ -19,11 +19,28 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> {
   String _selectedState = "Todos";
   String _selectedPub = "Todos";
 
-  final List<Question> _allQuestions = [
-    Question(title: "Como funciona a normalização até à 3FN em bases de dados?", description: "Estou com dificuldades a perceber os passos para normalizar uma tabela da 1FN até à 3FN. Alguém consegue...", status: "Aberta", userName: "Maria Rodrigues", userInitials: "MR", commentsCount: 8, timeAgo: "2h", tags: ["Bases de Dados", "Normalização", "3FN"], userCourse: "LEIC"),
-    Question(title: "Diferença entre INNER JOIN e LEFT JOIN com exemplos?", description: "Já li a documentação mas ainda não consigo distinguir bem os dois tipos de JOIN na prática...", status: "Resolvida", userName: "Ana Ferreira", userInitials: "AF", commentsCount: 12, timeAgo: "5h", tags: ["SQL", "Queries", "JOIN"], userCourse: "LSIRC"),
-    Question(title: "Erro ao criar trigger no MySQL — sintaxe incorreta", description: "Quando tento criar um trigger no Workbench aparece um erro de sintaxe mesmo seguindo o tutorial...", status: "Aberta", userName: "Anónimo", userInitials: "A", commentsCount: 3, timeAgo: "1d", tags: ["MySQL", "Triggers", "Erro"], userCourse: "Anónimo"),
-    Question(title: "Como otimizar uma query com múltiplos subqueries?", description: "A minha query demora demasiado tempo a executar. Tenho 3 subqueries aninhados e a tabela tem mais de...", status: "Resolvida", userName: "João Santos", userInitials: "JS", commentsCount: 15, timeAgo: "2d", tags: ["Otimização", "Performance"], userCourse: "LME"),
+  // A lista já não é 'final' para podermos adicionar novas perguntas
+  List<Question> _allQuestions = [
+    Question(
+      title: "Como funciona a normalização até à 3FN em bases de dados?", 
+      description: "Estou com dificuldades a perceber os passos para normalizar uma tabela da 1FN até à 3FN. O professor explicou na aula mas faltei essa semana.\n\nAlguém consegue explicar de forma clara o que é uma dependência funcional parcial vs uma dependência transitiva? Com um exemplo concreto seria perfeito — já li a documentação toda mas a linguagem é muito densa.\n\nDeixo o diagrama ER do nosso projeto que pode ajudar como contexto, e um bloco de código com a tabela que estou a tentar normalizar.", 
+      status: "Aberta", userName: "Maria Rodrigues", userInitials: "MR", commentsCount: 8, timeAgo: "2h", tags: ["Bases de Dados", "Normalização", "3FN"], userCourse: "LEIC"
+    ),
+    Question(
+      title: "Diferença entre INNER JOIN e LEFT JOIN com exemplos?", 
+      description: "Já li a documentação mas ainda não consigo distinguir bem os dois tipos de JOIN na prática. Sei que o INNER JOIN traz apenas os registos que fazem match em ambas as tabelas, mas o LEFT JOIN confunde-me quando há valores nulos do lado direito.\n\nPodem dar-me um exemplo simples com duas tabelas (ex: Clientes e Encomendas) para ver como os dados se comportam em cada um dos casos práticos?", 
+      status: "Resolvida", userName: "Ana Ferreira", userInitials: "AF", commentsCount: 12, timeAgo: "5h", tags: ["SQL", "Queries", "JOIN"], userCourse: "LSIRC"
+    ),
+    Question(
+      title: "Erro ao criar trigger no MySQL — sintaxe incorreta", 
+      description: "Quando tento criar um trigger no Workbench aparece um erro de sintaxe mesmo seguindo o tutorial passo a passo. O erro diz 'Error Code: 1064. You have an error in your SQL syntax near DELIMITER'.\n\nJá tentei mudar o delimitador para // e para \$\$, mas continua a não compilar o bloco BEGIN...END. Alguém já passou por isto e sabe como forçar a aceitação do delimitador?", 
+      status: "Aberta", userName: "Anónimo", userInitials: "A", commentsCount: 3, timeAgo: "1d", tags: ["MySQL", "Triggers", "Erro"], userCourse: "Anónimo"
+    ),
+    Question(
+      title: "Como otimizar uma query com múltiplos subqueries?", 
+      description: "A minha query demora demasiado tempo a executar (quase 5 segundos). Tenho 3 subqueries aninhados e a tabela principal tem mais de 500 mil registos.\n\nSerá que substituir os subqueries por múltiplos JOINs melhora a performance drasticamente? Ou devo antes considerar criar índices nas colunas de filtro principais? Aceito sugestões de boas práticas para otimização de arquiteturas pesadas.", 
+      status: "Resolvida", userName: "João Santos", userInitials: "JS", commentsCount: 15, timeAgo: "2d", tags: ["Otimização", "Performance"], userCourse: "LME"
+    ),
   ];
 
   List<Question> _displayedQuestions = [];
@@ -129,11 +146,26 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> {
           child: FloatingActionButton.extended(
             backgroundColor: const Color(0xFF009191),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-            onPressed: () {
-              Navigator.push(
+            // AQUI ESTÁ A MÁGICA DE ESPERAR PELA NOVA PERGUNTA
+            onPressed: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const ForumCreateQuestionPage()),
               );
+              
+              // Se a página de criação devolver uma pergunta, adiciona-a!
+              if (result != null && result is Question) {
+                setState(() {
+                  _allQuestions.insert(0, result); // Coloca no topo
+                  _applyFilters(); // Atualiza a lista no ecrã
+                });
+                
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Pergunta publicada com sucesso!"), backgroundColor: Colors.teal),
+                  );
+                }
+              }
             },
             icon: const Icon(Icons.add_circle_outline, color: Colors.white, size: 28), 
             label: const Column(
@@ -151,7 +183,7 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
-            ForumPageHeader(title: widget.subjectName), // Cabeçalho fixado no body
+            ForumPageHeader(title: widget.subjectName),
 
             SearchAndFilterBar(
               hintText: "Pesquisar pergunta...", 
@@ -176,13 +208,12 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> {
               : ListView.builder(
                   padding: const EdgeInsets.only(bottom: 80), 
                   itemCount: _displayedQuestions.length,
-                  itemBuilder: (context, index) => QuestionCard( // O onTap agora é passado diretamente!
+                  itemBuilder: (context, index) => QuestionCard(
                     question: _displayedQuestions[index],
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          // <--- ALTERADO: Envia a pergunta correta para a página de detalhes
                           builder: (context) => ForumQuestionDetailsPage(question: _displayedQuestions[index]),
                         ),
                       );
