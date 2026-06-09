@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/course.dart';
+import '../../services/forum_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import 'forum_questions_page.dart';
 
@@ -17,49 +18,6 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
   String _selectedOrder = "Padrão";
   String _selectedGroup = "Sem agrupamento";
 
-  final List<Course> _allCourses = [
-    Course(acronym: "LEIC", name: "Licenciatura em Engenharia Informática e de Computadores", type: "Licenciatura", subjectsCount: 28, area: "Informática", color: const Color(0xFF00BFA5)),
-    Course(acronym: "LSIRC", name: "Licenciatura em Segurança Informática em Redes e...", type: "Licenciatura", subjectsCount: 24, area: "Segurança", color: const Color(0xFF651FFF)),
-    Course(acronym: "LEI", name: "Licenciatura em Engenharia Eletrotécnica e de Computadores", type: "Licenciatura", subjectsCount: 26, area: "Eletrotécnica", color: const Color(0xFFFF9100)),
-    Course(acronym: "LME", name: "Licenciatura em Engenharia Mecânica", type: "Licenciatura", subjectsCount: 22, area: "Mecânica", color: const Color(0xFF00E676)),
-  ];
-
-  List<Course> _displayedCourses = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _displayedCourses = List.from(_allCourses);
-  }
-
-  void _applyFilters() {
-    List<Course> filtered = _allCourses.where((course) {
-      final searchLower = _searchQuery.toLowerCase();
-      return course.name.toLowerCase().contains(searchLower) ||
-             course.acronym.toLowerCase().contains(searchLower);
-    }).toList();
-
-    if (_selectedOrder == "Alfabético A-Z") {
-      filtered.sort((a, b) => a.acronym.compareTo(b.acronym));
-    } else if (_selectedOrder == "Alfabético Z-A") {
-      filtered.sort((a, b) => b.acronym.compareTo(a.acronym));
-    } else if (_selectedOrder == "+ Cadeiras") {
-      filtered.sort((a, b) => b.subjectsCount.compareTo(a.subjectsCount));
-    } else if (_selectedOrder == "- Cadeiras") {
-      filtered.sort((a, b) => a.subjectsCount.compareTo(b.subjectsCount));
-    }
-
-    if (_selectedGroup == "Tipo de curso") {
-      filtered.sort((a, b) => a.type.compareTo(b.type));
-    } else if (_selectedGroup == "Área temática") {
-      filtered.sort((a, b) => a.area.compareTo(b.area));
-    }
-
-    setState(() {
-      _displayedCourses = filtered;
-    });
-  }
-
   void _showFilterModal(BuildContext context) {
     String tempOrder = _selectedOrder;
     String tempGroup = _selectedGroup;
@@ -73,15 +31,12 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
           _selectedOrder = tempOrder;
           _selectedGroup = tempGroup;
         });
-        _applyFilters();
       },
       onClear: () {
         setState(() {
           _selectedOrder = "Padrão";
           _selectedGroup = "Sem agrupamento";
         });
-        _applyFilters();
-        Navigator.pop(context);
       },
       content: StatefulBuilder(
         builder: (BuildContext context, StateSetter setModalState) {
@@ -95,8 +50,8 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                   FilterChipWidget(label: "Padrão", isSelected: tempOrder == "Padrão", onTap: () => setModalState(() => tempOrder = "Padrão")),
                   FilterChipWidget(label: "Alfabético A-Z", isSelected: tempOrder == "Alfabético A-Z", onTap: () => setModalState(() => tempOrder = "Alfabético A-Z")),
                   FilterChipWidget(label: "Alfabético Z-A", isSelected: tempOrder == "Alfabético Z-A", onTap: () => setModalState(() => tempOrder = "Alfabético Z-A")),
-                  FilterChipWidget(label: "+ Cadeiras", isSelected: tempOrder == "+ Cadeiras", onTap: () => setModalState(() => tempOrder = "+ Cadeiras")),
-                  FilterChipWidget(label: "- Cadeiras", isSelected: tempOrder == "- Cadeiras", onTap: () => setModalState(() => tempOrder = "- Cadeiras")),
+                  FilterChipWidget(label: "+ Perguntas", isSelected: tempOrder == "+ Perguntas", onTap: () => setModalState(() => tempOrder = "+ Perguntas")),
+                  FilterChipWidget(label: "- Perguntas", isSelected: tempOrder == "- Perguntas", onTap: () => setModalState(() => tempOrder = "- Perguntas")),
                 ],
               ),
               const SizedBox(height: 24),
@@ -120,41 +75,153 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
-            ForumPageHeader(title: widget.schoolName), // Cabeçalho fixado no body
+            ForumPageHeader(title: widget.schoolName),
             SearchAndFilterBar(
               hintText: "Pesquisar curso...",
               onFilterTap: () => _showFilterModal(context),
-              onChanged: (value) {
-                _searchQuery = value;
-                _applyFilters();
-              },
+              onChanged: (value) => setState(() => _searchQuery = value),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Todos os Cursos", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text("${_displayedCourses.length} cursos", style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
-            const SizedBox(height: 16),
             Expanded(
-              child: _displayedCourses.isEmpty 
-              ? const Center(child: Text("Nenhum curso encontrado.", style: TextStyle(color: Colors.grey)))
-              : ListView.builder(
-                  itemCount: _displayedCourses.length,
-                  itemBuilder: (context, index) => CourseCard(
-                    course: _displayedCourses[index], 
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ForumQuestionsPage(subjectName: _displayedCourses[index].acronym),
+              child: StreamBuilder<List<Course>>(
+                stream: ForumService().getCoursesStream(widget.schoolName),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFF009191)));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text("Nenhum curso encontrado nesta escola.", style: TextStyle(color: Colors.grey))
+                    );
+                  }
+
+                  // 1. Filtrar pela pesquisa
+                  List<Course> filtered = snapshot.data!.where((course) {
+                    final searchLower = _searchQuery.toLowerCase();
+                    return course.name.toLowerCase().contains(searchLower) ||
+                           course.acronym.toLowerCase().contains(searchLower);
+                  }).toList();
+
+                  // 2. Ordenação Combinada (Primeiro Grupo, Depois Ordem)
+                  filtered.sort((a, b) {
+                    // Sort do Grupo
+                    if (_selectedGroup == "Tipo de curso") {
+                      int groupCmp = a.type.compareTo(b.type);
+                      if (groupCmp != 0) return groupCmp;
+                    } else if (_selectedGroup == "Área temática") {
+                      int groupCmp = a.area.compareTo(b.area);
+                      if (groupCmp != 0) return groupCmp;
+                    }
+
+                    // Sort da Ordem (aplica-se dentro de cada grupo)
+                    if (_selectedOrder == "Alfabético A-Z") {
+                      return a.acronym.compareTo(b.acronym);
+                    } else if (_selectedOrder == "Alfabético Z-A") {
+                      return b.acronym.compareTo(a.acronym);
+                    } else if (_selectedOrder == "+ Perguntas") {
+                      int countCmp = b.questionsCount.compareTo(a.questionsCount);
+                      if (countCmp != 0) return countCmp;
+                      return a.acronym.compareTo(b.acronym); // Desempate alfabético
+                    } else if (_selectedOrder == "- Perguntas") {
+                      int countCmp = a.questionsCount.compareTo(b.questionsCount);
+                      if (countCmp != 0) return countCmp;
+                      return a.acronym.compareTo(b.acronym); // Desempate alfabético
+                    }
+
+                    return 0; // Padrão
+                  });
+
+                  return Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Todos os Cursos", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text("${filtered.length} cursos", style: const TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, index) {
+                            final course = filtered[index];
+                            bool showGroupHeader = false;
+                            String groupTitle = "";
+
+                            // 3. Lógica para mostrar o Cabeçalho de Grupo
+                            if (_selectedGroup != "Sem agrupamento") {
+                              groupTitle = _selectedGroup == "Tipo de curso" ? course.type : course.area;
+                              
+                              if (index == 0) {
+                                showGroupHeader = true; // É o primeiro item, mostra sempre o grupo
+                              } else {
+                                final prevCourse = filtered[index - 1];
+                                final prevGroupTitle = _selectedGroup == "Tipo de curso" ? prevCourse.type : prevCourse.area;
+                                if (groupTitle != prevGroupTitle) {
+                                  showGroupHeader = true; // O grupo mudou, mostra o título
+                                }
+                              }
+                            }
+
+                            // O Cartão do Curso
+                            Widget courseCard = CourseCard(
+                              course: course, 
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ForumQuestionsPage(subjectName: course.acronym)),
+                                );
+                              },
+                            );
+
+                            // Se precisarmos do cabeçalho, devolvemos a NOVA divisória + cartão
+                            if (showGroupHeader) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (index > 0) const SizedBox(height: 28), // Espaço extra antes de um novo grupo
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        groupTitle.toUpperCase(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xFF009191),
+                                          letterSpacing: 1.2, // Um pouco mais de espaço entre as letras
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      // Esta é a nova linha de destaque (verde e mais grossa)
+                                      Expanded(
+                                        child: Container(
+                                          height: 2,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF009191).withOpacity(0.3),
+                                            borderRadius: BorderRadius.circular(2),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  courseCard,
+                                ],
+                              );
+                            }
+
+                            // Caso contrário, apenas o cartão
+                            return courseCard;
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             )
           ],
         ),

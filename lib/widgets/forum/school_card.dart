@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/school.dart';
-import 'custom_badge.dart';
+import '../../models/forum/course.dart'; // <--- NOVO IMPORT
+import '../../services/forum_service.dart'; // <--- NOVO IMPORT
 
 class SchoolCard extends StatefulWidget {
   final School school;
@@ -17,68 +18,67 @@ class _SchoolCardState extends State<SchoolCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Definimos o raio dos cantos aqui para reutilizar
-    final borderRadius = BorderRadius.circular(20.0);
-
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
-        alignment: FractionalOffset.center,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: borderRadius,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(_isHovered ? 0.12 : 0.05),
-              blurRadius: _isHovered ? 15 : 10,
-              spreadRadius: _isHovered ? 4 : 2,
-              offset: _isHovered ? const Offset(0, 8) : const Offset(0, 0),
-            )
-          ],
-        ),
-        // A SOLUÇÃO ESTÁ AQUI: ClipRRect obriga o clique a não sair dos cantos!
-        child: ClipRRect(
-          borderRadius: borderRadius,
-          child: Material(
-            color: Colors.transparent, 
-            child: InkWell(
-              onTap: widget.onTap,
-              // Cores de clique e hover muito mais suaves e integradas
-              hoverColor: Colors.grey.withOpacity(0.05),
-              splashColor: const Color(0xFF009191).withOpacity(0.1),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0), 
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min, 
-                  children: [
-                    Icon(widget.school.icon, size: 40, color: Colors.grey[700]),
-                    const SizedBox(height: 12),
-                    Text(
-                      widget.school.acronym,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF1D204B)),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      widget.school.name,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 10, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 12),
-                    CustomBadge(
-                      text: "${widget.school.coursesCount} cursos",
-                      textColor: const Color(0xFF009191),
-                      bgColor: const Color(0xFFE0F2F1),
-                    )
-                  ],
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          transform: Matrix4.identity()..scale(_isHovered ? 1.03 : 1.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(_isHovered ? 0.08 : 0.03),
+                blurRadius: _isHovered ? 15 : 10,
+                offset: _isHovered ? const Offset(0, 5) : const Offset(0, 2),
+              )
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(widget.school.icon, size: 40, color: const Color(0xFF1D204B)),
+              const SizedBox(height: 12),
+              Text(widget.school.acronym, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF1D204B))),
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  widget.school.name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
+              const SizedBox(height: 12),
+              
+              // --- AQUI ESTÁ A CONTAGEM DINÂMICA DE CURSOS ---
+              StreamBuilder<List<Course>>(
+                stream: ForumService().getCoursesStream(widget.school.acronym),
+                builder: (context, snapshot) {
+                  // Conta quantos cursos chegaram do Firebase
+                  int count = snapshot.hasData ? snapshot.data!.length : 0;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE0F2F1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      "$count cursos",
+                      style: const TextStyle(color: Color(0xFF009191), fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                  );
+                },
+              ),
+              // ----------------------------------------------------
+              
+            ],
           ),
         ),
       ),

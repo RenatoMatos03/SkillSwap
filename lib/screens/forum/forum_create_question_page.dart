@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/forum/question.dart';
+import '../../services/forum_service.dart';
+import '../../services/user_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
-import '../../widgets/widgets.dart'; // Para os AuthButton e custom tags se estiverem aqui
+import '../../widgets/widgets.dart';
+import '../../widgets/custom_confirmation_dialog.dart';
 
 class ForumCreateQuestionPage extends StatefulWidget {
-  const ForumCreateQuestionPage({super.key});
+  final String subjectName; 
+
+  const ForumCreateQuestionPage({super.key, required this.subjectName});
 
   @override
   State<ForumCreateQuestionPage> createState() => _ForumCreateQuestionPageState();
@@ -16,8 +23,8 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
   final TextEditingController _descController = TextEditingController();
   
   final List<String> _tags = [];
-  final List<Map<String, dynamic>> _attachments = []; // Lista vazia para simular anexos
   bool _isAnonymous = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,65 +34,81 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
     super.dispose();
   }
 
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    return parts.isNotEmpty && parts.first.isNotEmpty ? parts.first[0].toUpperCase() : '?';
+  }
+
   void _addTag() {
     final tag = _tagController.text;
     if (tag.trim().isNotEmpty && !_tags.contains(tag.trim())) {
-      setState(() {
-        _tags.add(tag.trim());
-      });
+      setState(() => _tags.add(tag.trim()));
       _tagController.clear();
     }
   }
 
   void _removeTag(String tag) {
-    setState(() {
-      _tags.remove(tag);
-    });
+    setState(() => _tags.remove(tag));
   }
 
-  // Simula a adição de um anexo ao clicar nos botões
-  void _addMockAttachment(String type) {
-    setState(() {
-      if (type == 'Imagem') {
-        _attachments.add({"icon": Icons.image, "color": Colors.teal, "title": "captura_ecra.png", "subtitle": "PNG · 800 KB"});
-      } else if (type == 'Ficheiro') {
-        _attachments.add({"icon": Icons.picture_as_pdf, "color": Colors.redAccent, "title": "documento_apoio.pdf", "subtitle": "PDF · 1.5 MB"});
-      } else if (type == 'Código') {
-        _attachments.add({"icon": Icons.code, "color": Colors.blueGrey, "title": "script.sql", "subtitle": "SQL · 12 KB"});
-      }
-    });
-  }
-
-  void _removeAttachment(int index) {
-    setState(() {
-      _attachments.removeAt(index);
-    });
-  }
-
-  void _publishQuestion() {
-    // Validação simples
+  // 1. FUNÇÃO QUE MOSTRA O POP-UP DE CONFIRMAÇÃO
+  void _confirmPublish() {
     if (_titleController.text.trim().isEmpty || _descController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Por favor, preenche o título e a descrição.", style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+        const SnackBar(content: Text("Preenche o título e a descrição."), backgroundColor: Colors.red),
       );
       return;
     }
 
-    // Cria a nova pergunta
-    final newQuestion = Question(
-      title: _titleController.text.trim(),
-      description: _descController.text.trim(),
-      status: "Aberta",
-      userName: _isAnonymous ? "Anónimo" : "Maria Rodrigues", // Simula o utilizador atual
-      userInitials: _isAnonymous ? "A" : "MR",
-      userCourse: _isAnonymous ? "Anónimo" : "LEIC",
-      commentsCount: 0,
-      timeAgo: "agora",
-      tags: List.from(_tags),
+    showDialog(
+      context: context,
+      builder: (ctx) => CustomConfirmationDialog(
+        title: "Publicar Pergunta?",
+        content: "Tens a certeza que queres publicar esta pergunta?\n\nSerão descontadas 2 moedas do teu saldo.",
+        onConfirm: _executePublish, // Chama a função que grava na Base de Dados
+      ),
     );
+  }
 
-    // Devolve a pergunta para a página anterior
-    Navigator.pop(context, newQuestion);
+  // 2. FUNÇÃO QUE EXECUTA A GRAVAÇÃO REAL NA BD
+  Future<void> _executePublish() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final profile = await UserService().getUserProfile();
+      final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+      
+      final newQuestion = Question(
+        userId: uid,
+        subjectName: widget.subjectName,
+        title: _titleController.text.trim(),
+        description: _descController.text.trim(),
+        status: "Aberta",
+        userName: _isAnonymous ? "Anónimo" : (profile?.name ?? "Utilizador"),
+        userInitials: _isAnonymous ? "A" : (profile != null ? _getInitials(profile.name) : "U"),
+        userCourse: _isAnonymous ? "Anónimo" : (profile?.course ?? "IPS"),
+        commentsCount: 0,
+        createdAt: DateTime.now(), 
+        tags: List.from(_tags),
+      );
+
+      await ForumService().createQuestion(newQuestion);
+      
+      if (uid.isNotEmpty) {
+        await FirebaseFirestore.instance.collection('users').doc(uid).update({
+          'coins': FieldValue.increment(-2) 
+        });
+      }
+      
+      if (mounted) {
+        Navigator.pop(context, true); 
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erro: $e")));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -101,26 +124,13 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
 
             const Text("TAGS DA PERGUNTA", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 8),
-            
-            CustomTagInputField(
-              controller: _tagController,
-              hintText: "Ex: Base de Dados...",
-              onAdd: _addTag,
-            ),
+            CustomTagInputField(controller: _tagController, hintText: "Ex: Base de Dados...", onAdd: _addTag),
             const SizedBox(height: 16),
             
             if (_tags.isNotEmpty)
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _tags.map((tag) => CustomTagChip(
-                  label: tag,
-                  onRemove: () => _removeTag(tag),
-                )).toList(),
-              ),
+              Wrap(spacing: 8, runSpacing: 8, children: _tags.map((tag) => CustomTagChip(label: tag, onRemove: () => _removeTag(tag))).toList()),
             
             const SizedBox(height: 24),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -132,14 +142,8 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             TextField(
               controller: _titleController,
               maxLength: 120,
-              onChanged: (text) => setState(() {}), // Para atualizar o contador
-              decoration: InputDecoration(
-                hintText: "Qual é a tua dúvida? (sê específico)",
-                counterText: "",
-                filled: true,
-                fillColor: const Color(0xFFF2F5F7),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-              ),
+              onChanged: (_) => setState(() {}), 
+              decoration: InputDecoration(hintText: "Qual é a tua dúvida?", counterText: "", filled: true, fillColor: const Color(0xFFF2F5F7), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
             ),
             const SizedBox(height: 24),
 
@@ -148,28 +152,13 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             TextField(
               controller: _descController,
               maxLines: 6,
-              decoration: InputDecoration(
-                hintText: "Descreve o teu problema em detalhe, inclui o que já tentaste...",
-                filled: true,
-                fillColor: const Color(0xFFF2F5F7),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-              ),
+              decoration: InputDecoration(hintText: "Descreve o teu problema em detalhe...", filled: true, fillColor: const Color(0xFFF2F5F7), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
             ),
             const SizedBox(height: 24),
 
             Row(
               children: [
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: Checkbox(
-                    value: _isAnonymous,
-                    activeColor: const Color(0xFF009191),
-                    onChanged: (val) {
-                      setState(() => _isAnonymous = val ?? false);
-                    },
-                  ),
-                ),
+                SizedBox(width: 24, height: 24, child: Checkbox(value: _isAnonymous, activeColor: const Color(0xFF009191), onChanged: (val) => setState(() => _isAnonymous = val ?? false))),
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Column(
@@ -182,45 +171,12 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
                 )
               ],
             ),
-            const SizedBox(height: 24),
-
-            const Text("ANEXOS (OPCIONAL)", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                GestureDetector(onTap: () => _addMockAttachment('Imagem'), child: _buildAttachmentButton(Icons.image, "Imagem")),
-                const SizedBox(width: 8),
-                GestureDetector(onTap: () => _addMockAttachment('Ficheiro'), child: _buildAttachmentButton(Icons.attach_file, "Ficheiro")),
-                const SizedBox(width: 8),
-                GestureDetector(onTap: () => _addMockAttachment('Código'), child: _buildAttachmentButton(Icons.code, "Código")),
-              ],
-            ),
-            const SizedBox(height: 16),
-            
-            // Desenha a lista de anexos dinamicamente se existirem
-            ..._attachments.asMap().entries.map((entry) {
-              int idx = entry.key;
-              var att = entry.value;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: AttachedFileCard(
-                  icon: att["icon"],
-                  iconColor: att["color"],
-                  title: att["title"],
-                  subtitle: att["subtitle"],
-                  trailingWidget: GestureDetector(
-                    onTap: () => _removeAttachment(idx),
-                    child: const Icon(Icons.close, size: 18, color: Colors.grey),
-                  ),
-                ),
-              );
-            }),
-            
             const SizedBox(height: 40),
 
             AuthButton(
-              text: "Publicar Pergunta",
-              onPressed: _publishQuestion, // Chama a nossa função de publicar!
+              text: _isLoading ? "A publicar..." : "Publicar Pergunta",
+              // AGORA CHAMA A FUNÇÃO DO POP-UP
+              onPressed: _isLoading ? null : _confirmPublish, 
             ),
             const Center(
               child: Padding(
@@ -230,24 +186,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAttachmentButton(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 14, color: Colors.grey),
-          const SizedBox(width: 6),
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
-        ],
       ),
     );
   }

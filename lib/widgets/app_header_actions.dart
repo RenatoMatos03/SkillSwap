@@ -1,43 +1,63 @@
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart'; // <--- NOVO IMPORT
+import 'package:firebase_auth/firebase_auth.dart';     // <--- NOVO IMPORT
 import '../theme/app_tokens.dart';
 
 class AppBalanceChip extends StatelessWidget {
-  final String value;
   final VoidCallback? onTap;
 
-  const AppBalanceChip({super.key, this.value = '0', this.onTap});
+  // Removi o "value" daqui, pois ele agora lê sempre do Firebase automaticamente!
+  const AppBalanceChip({super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Semantics(
-        label: 'Saldo atual $value',
-        button: onTap != null,
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceMint,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.copyright, size: 18, color: AppColors.primary),
-              const SizedBox(width: 6),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    // STREAM BUILDER: Fica à escuta das moedas deste utilizador
+    return StreamBuilder<DocumentSnapshot>(
+      stream: currentUser != null 
+          ? FirebaseFirestore.instance.collection('users').doc(currentUser.uid).snapshots()
+          : const Stream.empty(),
+      builder: (context, snapshot) {
+        
+        String displayValue = '0';
+        
+        // Se houver dados, atualizamos o valor a mostrar
+        if (snapshot.hasData && snapshot.data!.exists) {
+          final data = snapshot.data!.data() as Map<String, dynamic>;
+          displayValue = (data['coins'] ?? 0).toString();
+        }
+
+        return InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Semantics(
+            label: 'Saldo atual $displayValue',
+            button: onTap != null,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMint,
+                borderRadius: BorderRadius.circular(20),
               ),
-            ],
+              child: Row(
+                children: [
+                  const Icon(Icons.copyright, size: 18, color: AppColors.primary),
+                  const SizedBox(width: 6),
+                  Text(
+                    displayValue, // <--- MOSTRA O VALOR EM TEMPO REAL
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 }

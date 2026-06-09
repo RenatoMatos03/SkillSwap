@@ -78,10 +78,9 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           AppBalanceChip(
-            value: '${_profile?.coins ?? 0}',
             onTap: () => _showInfoSheet(
               title: 'Saldo SkillSwap',
-              message: 'Tens ${_profile?.coins ?? 0} coins disponíveis.',
+              message: 'Este é o teu saldo de moedas atualizado em tempo real.',
             ),
           ),
           AppUserAvatar(
@@ -255,7 +254,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Widget do Menu Lateral
   Widget _buildDrawer() {
     return Drawer(
       backgroundColor: AppColors.cardBackground,

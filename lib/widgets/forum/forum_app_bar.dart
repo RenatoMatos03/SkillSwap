@@ -23,7 +23,8 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       actions: const [
-        AppBalanceChip(value: '100 €'),
+        // AQUI: Removido o parâmetro "value"
+        AppBalanceChip(), 
         SizedBox(width: 8),
         AppUserAvatar(initials: 'MR'),
         SizedBox(width: 16),
