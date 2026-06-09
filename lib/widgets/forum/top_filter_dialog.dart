@@ -13,7 +13,7 @@ void showTopFilterDialog({
     context: context,
     barrierDismissible: true,
     barrierLabel: "TopFilterDialog",
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) {
       return Align(

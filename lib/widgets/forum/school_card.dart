@@ -26,14 +26,14 @@ class _SchoolCardState extends State<SchoolCard> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          transform: Matrix4.identity()..scale(_isHovered ? 1.03 : 1.0),
+          transform: Matrix4.identity()..scaled(_isHovered ? 1.03 : 1.0, _isHovered ? 1.03 : 1.0, 1.0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             // AQUI ESTÁ O AJUSTE: Sombra mais pronunciada
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.06),
+                color: Colors.black.withValues(alpha: _isHovered ? 0.15 : 0.06),
                 blurRadius: _isHovered ? 20 : 10,
                 spreadRadius: _isHovered ? 2 : 0,
                 offset: _isHovered ? const Offset(0, 8) : const Offset(0, 3),

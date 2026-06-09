@@ -20,7 +20,7 @@ class School {
       'acronym': acronym,
       'name': name,
       'coursesCount': coursesCount,
-      'iconCode': icon.codePoint, // Guarda o código do ícone
+      'iconCode': icon.codePoint,
     };
   }
 
