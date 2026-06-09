@@ -91,77 +91,13 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = FirebaseAuth.instance.currentUser;
-
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: StreamBuilder<DocumentSnapshot>(
-        stream: currentUser != null 
-            ? FirebaseFirestore.instance.collection('users').doc(currentUser.uid).snapshots()
-            : const Stream.empty(),
-        builder: (context, snapshot) {
-          int coins = 0;
-          if (snapshot.hasData && snapshot.data!.exists) {
-            final data = snapshot.data!.data() as Map<String, dynamic>;
-            coins = data['coins'] ?? 0;
-          }
-          
-          bool hasEnoughCoins = coins >= 2;
-
-          return AnimatedBuilder(
-            animation: _shakeController,
-            builder: (context, child) {
-              final sineValue = sin(4 * pi * _shakeController.value);
-              
-              return Transform.translate(
-                offset: Offset(sineValue * 8, 0), 
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 32.0), 
-                  child: SizedBox(
-                    height: 65, width: 260, 
-                    child: FloatingActionButton.extended(
-                      backgroundColor: hasEnoughCoins ? const Color(0xFF009191) : Colors.grey[400],
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                      onPressed: () async {
-                        if (!hasEnoughCoins) {
-                          _shakeController.forward(from: 0.0);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Não tem moedas suficientes, realize o quiz semanal ou faça uma explicação com alguém"),
-                              backgroundColor: Colors.redAccent,
-                              duration: Duration(seconds: 4),
-                            ),
-                          );
-                          return; 
-                        }
-
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ForumCreateQuestionPage(subjectName: widget.subjectName)),
-                        );
-                        
-                        if (result != null && mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Pergunta publicada com sucesso! Foram descontadas 2 moedas."), backgroundColor: Colors.teal),
-                          );
-                        }
-                      },
-                      icon: Icon(Icons.add_circle_outline, color: hasEnoughCoins ? Colors.white : Colors.white70, size: 28), 
-                      label: Column(
-                        mainAxisAlignment: MainAxisAlignment.center, 
-                        children: [ 
-                          Text("Fazer uma Pergunta", style: TextStyle(color: hasEnoughCoins ? Colors.white : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)), 
-                          Text("custa 2 moedas", style: TextStyle(color: hasEnoughCoins ? Colors.white70 : Colors.white60, fontSize: 11)) 
-                        ]
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }
-          );
-        }
+      // O COMPONENTE GIGANTE FOI MOVIDO DAQUI E ENCAPSULADO ABAIXO!
+      floatingActionButton: _ForumCreateQuestionFab(
+        subjectName: widget.subjectName,
+        shakeController: _shakeController,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -229,6 +165,90 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
           ],
         ),
       ),
+    );
+  }
+}
+
+/// CLASSE ENCAPSULADA: Botão flutuante que gere a sua própria ligação ao Firebase e Animações
+class _ForumCreateQuestionFab extends StatelessWidget {
+  final String subjectName;
+  final AnimationController shakeController;
+
+  const _ForumCreateQuestionFab({
+    required this.subjectName,
+    required this.shakeController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: currentUser != null 
+          ? FirebaseFirestore.instance.collection('users').doc(currentUser.uid).snapshots()
+          : const Stream.empty(),
+      builder: (context, snapshot) {
+        int coins = 0;
+        if (snapshot.hasData && snapshot.data!.exists) {
+          final data = snapshot.data!.data() as Map<String, dynamic>;
+          coins = data['coins'] ?? 0;
+        }
+        
+        bool hasEnoughCoins = coins >= 2;
+
+        return AnimatedBuilder(
+          animation: shakeController,
+          builder: (context, child) {
+            final sineValue = sin(4 * pi * shakeController.value);
+            
+            return Transform.translate(
+              offset: Offset(sineValue * 8, 0), 
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 32.0), 
+                child: SizedBox(
+                  height: 65, width: 260, 
+                  child: FloatingActionButton.extended(
+                    backgroundColor: hasEnoughCoins ? const Color(0xFF009191) : Colors.grey[400],
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                    onPressed: () async {
+                      if (!hasEnoughCoins) {
+                        shakeController.forward(from: 0.0);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Não tem moedas suficientes, realize o quiz semanal ou faça uma explicação com alguém"),
+                            backgroundColor: Colors.redAccent,
+                            duration: Duration(seconds: 4),
+                          ),
+                        );
+                        return; 
+                      }
+
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForumCreateQuestionPage(subjectName: subjectName)),
+                      );
+                      
+                      if (result != null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Pergunta publicada com sucesso! Foram descontadas 2 moedas."), backgroundColor: Colors.teal),
+                        );
+                      }
+                    },
+                    icon: Icon(Icons.add_circle_outline, color: hasEnoughCoins ? Colors.white : Colors.white70, size: 28), 
+                    label: Column(
+                      mainAxisAlignment: MainAxisAlignment.center, 
+                      children: [ 
+                        Text("Fazer uma Pergunta", style: TextStyle(color: hasEnoughCoins ? Colors.white : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)), 
+                        Text("custa 2 moedas", style: TextStyle(color: hasEnoughCoins ? Colors.white70 : Colors.white60, fontSize: 11)) 
+                      ]
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+        );
+      }
     );
   }
 }

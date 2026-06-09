@@ -47,7 +47,7 @@ class ForumService {
 
   Future<void> addComment(String questionId, CommentModel comment) async {
     final docRef = _db.collection('questions').doc(questionId).collection('comments').doc();
-    comment.id = docRef.id;
+    comment.id = docRef.id; // Garante que tem o ID antes de guardar
     await docRef.set(comment.toMap());
     
     await _db.collection('questions').doc(questionId).update({
@@ -92,11 +92,42 @@ class ForumService {
     await batch.commit(); 
   }
 
-  // --- NOVA FUNÇÃO: APAGAR A PERGUNTA ---
+  Future<void> voteComment(String questionId, String commentId, int voteChange) async {
+    final commentRef = _db.collection('questions').doc(questionId).collection('comments').doc(commentId);
+    await commentRef.update({
+      'votes': FieldValue.increment(voteChange)
+    });
+  }
+
+  // NOVO: Função com transação para encontrar e atualizar votos num subcomentário dentro de um array
+  Future<void> voteReply(String questionId, String parentCommentId, String replyId, int voteChange) async {
+    final commentRef = _db.collection('questions').doc(questionId).collection('comments').doc(parentCommentId);
+    
+    await _db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(commentRef);
+      if (!snapshot.exists) return;
+      
+      final data = snapshot.data();
+      if (data == null || data['replies'] == null) return;
+      
+      List<dynamic> replies = data['replies'];
+      List<Map<String, dynamic>> updatedReplies = [];
+      
+      for (var r in replies) {
+        Map<String, dynamic> replyMap = Map<String, dynamic>.from(r as Map);
+        if (replyMap['id'] == replyId) {
+          replyMap['votes'] = (replyMap['votes'] ?? 0) + voteChange;
+        }
+        updatedReplies.add(replyMap);
+      }
+      
+      transaction.update(commentRef, {'replies': updatedReplies});
+    });
+  }
+
   Future<void> deleteQuestion(String questionId, String subjectName) async {
     final batch = _db.batch();
 
-    // 1. Subtrai 1 ao contador de perguntas do curso
     final courseQuery = await _db.collection('courses').where('acronym', isEqualTo: subjectName).limit(1).get();
     if (courseQuery.docs.isNotEmpty) {
       batch.update(courseQuery.docs.first.reference, {
@@ -104,17 +135,14 @@ class ForumService {
       });
     }
 
-    // 2. Apaga todos os comentários dentro desta pergunta para não deixar dados órfãos na BD
     final commentsSnapshot = await _db.collection('questions').doc(questionId).collection('comments').get();
     for (var doc in commentsSnapshot.docs) {
       batch.delete(doc.reference);
     }
 
-    // 3. Apaga a própria pergunta
     final questionRef = _db.collection('questions').doc(questionId);
     batch.delete(questionRef);
 
-    // Executa as ações todas juntas
     await batch.commit();
   }
 }

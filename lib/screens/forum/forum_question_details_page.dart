@@ -6,6 +6,7 @@ import '../../services/forum_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import '../../widgets/widgets.dart';
+import '../../utils/utils.dart'; // <--- O TEU NOVO IMPORT LIMPO
 
 class ForumQuestionDetailsPage extends StatefulWidget {
   final Question question;
@@ -22,6 +23,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
   
   bool _sortDescending = true;  
   CommentModel? _replyingTo;    
+  String? _replyingToRootId; 
   late bool _isResolved;
 
   @override
@@ -37,23 +39,22 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
     super.dispose();
   }
 
-  String _getInitials(String name) {
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
-    return parts.isNotEmpty && parts.first.isNotEmpty ? parts.first[0].toUpperCase() : '?';
-  }
-
   Future<void> _submitComment() async {
-    final text = _commentController.text.trim();
+    String text = _commentController.text.trim();
     if (text.isEmpty) return;
 
     final profile = await UserService().getUserProfile();
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
+    final String generatedId = "${DateTime.now().millisecondsSinceEpoch}_$uid";
+
     final newComment = CommentModel(
+      id: generatedId,
+      parentCommentId: _replyingTo?.id, 
       userId: uid,
       userName: profile?.name ?? "Utilizador",
-      userInitials: profile != null ? _getInitials(profile.name) : "U",
+      // CHAMA A FUNÇÃO GLOBAL AQUI
+      userInitials: profile != null ? getInitials(profile.name) : "U",
       badge: profile?.course ?? "IPS",
       createdAt: DateTime.now(),
       votes: 0,
@@ -61,14 +62,17 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
       isSolution: false,
     );
 
-    if (_replyingTo != null) {
-      await ForumService().addReply(widget.question.id!, _replyingTo!.id!, newComment);
+    if (_replyingTo != null && _replyingToRootId != null) {
+      await ForumService().addReply(widget.question.id!, _replyingToRootId!, newComment);
     } else {
       await ForumService().addComment(widget.question.id!, newComment);
     }
 
     _commentController.clear();
-    setState(() => _replyingTo = null);
+    setState(() {
+      _replyingTo = null;
+      _replyingToRootId = null;
+    });
     _commentFocusNode.unfocus();
   }
 
@@ -113,6 +117,9 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
   }
 
   Widget _buildAuthorHeader(bool isOwner) {
+    // CHAMA A FUNÇÃO GLOBAL AQUI
+    final String acronym = getCourseAcronym(widget.question.userCourse);
+
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 24),
       child: Row(
@@ -126,9 +133,26 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(children: [Text(widget.question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)), const SizedBox(width: 8), CustomBadge(text: widget.question.userCourse, textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withOpacity(0.1))]),
-                const SizedBox(height: 4),
-                Row(children: [CustomBadge(text: _isResolved ? "Resolvida" : "Aberta", textColor: _isResolved ? const Color(0xFF009191) : Colors.grey[700]!, bgColor: _isResolved ? const Color(0xFFE0F2F1) : Colors.grey[200]!, icon: _isResolved ? Icons.check_circle : Icons.circle_outlined), const SizedBox(width: 8), Text("há ${widget.question.timeAgo}", style: const TextStyle(color: Colors.grey, fontSize: 12))])
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(widget.question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)), 
+                    if (acronym.isNotEmpty)
+                      CustomBadge(text: acronym, textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withOpacity(0.1))
+                  ]
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    CustomBadge(text: _isResolved ? "Resolvida" : "Aberta", textColor: _isResolved ? const Color(0xFF009191) : Colors.grey[700]!, bgColor: _isResolved ? const Color(0xFFE0F2F1) : Colors.grey[200]!, icon: _isResolved ? Icons.check_circle : Icons.circle_outlined), 
+                    Text("há ${widget.question.timeAgo}", style: const TextStyle(color: Colors.grey, fontSize: 12))
+                  ]
+                )
               ],
             ),
           ),
@@ -151,10 +175,10 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                   }
                 },
                 itemBuilder: (BuildContext context) => [
-                  PopupMenuItem<String>(
+                  const PopupMenuItem<String>(
                     value: 'delete',
                     child: Row(
-                      children: const [
+                      children: [
                         Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
                         SizedBox(width: 8),
                         Text("Eliminar Questão", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
@@ -213,9 +237,15 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                       final bool canAccept = isOwner && !_isResolved && comment.userId != currentUserId;
 
                       return CommentItem(
+                        key: ValueKey(comment.id), 
+                        questionId: widget.question.id!,
+                        rootCommentId: comment.id!, 
                         comment: comment,
-                        onReply: (c) {
-                          setState(() => _replyingTo = c);
+                        onReply: (rootId, c) { 
+                          setState(() {
+                            _replyingToRootId = rootId;
+                            _replyingTo = c;
+                          });
                           _commentFocusNode.requestFocus();
                         },
                         showAcceptButton: canAccept, 
@@ -231,7 +261,10 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
             controller: _commentController,
             focusNode: _commentFocusNode,
             replyingTo: _replyingTo,
-            onCancelReply: () => setState(() => _replyingTo = null),
+            onCancelReply: () => setState(() {
+              _replyingTo = null;
+              _replyingToRootId = null;
+            }),
             onSubmit: _submitComment,
           ),
         ],

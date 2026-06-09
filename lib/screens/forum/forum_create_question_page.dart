@@ -6,6 +6,7 @@ import '../../services/forum_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import '../../widgets/widgets.dart';
+import '../../utils/utils.dart'; // <--- O TEU NOVO IMPORT LIMPO
 
 class ForumCreateQuestionPage extends StatefulWidget {
   final String subjectName; 
@@ -33,12 +34,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
     super.dispose();
   }
 
-  String _getInitials(String name) {
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
-    return parts.isNotEmpty && parts.first.isNotEmpty ? parts.first[0].toUpperCase() : '?';
-  }
-
   void _addTag() {
     final tag = _tagController.text;
     if (tag.trim().isNotEmpty && !_tags.contains(tag.trim())) {
@@ -64,7 +59,7 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
       builder: (ctx) => CustomConfirmationDialog(
         title: "Publicar Pergunta?",
         content: "Tens a certeza que queres publicar esta pergunta?\n\nSerão descontadas 2 moedas do teu saldo.",
-        onConfirm: _executePublish, // Chama a função que grava na Base de Dados
+        onConfirm: _executePublish, 
       ),
     );
   }
@@ -83,7 +78,8 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
         description: _descController.text.trim(),
         status: "Aberta",
         userName: _isAnonymous ? "Anónimo" : (profile?.name ?? "Utilizador"),
-        userInitials: _isAnonymous ? "A" : (profile != null ? _getInitials(profile.name) : "U"),
+        // CHAMA A FUNÇÃO GLOBAL AQUI
+        userInitials: _isAnonymous ? "A" : (profile != null ? getInitials(profile.name) : "U"),
         userCourse: _isAnonymous ? "Anónimo" : (profile?.course ?? "IPS"),
         commentsCount: 0,
         createdAt: DateTime.now(), 

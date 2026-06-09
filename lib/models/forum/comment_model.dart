@@ -1,17 +1,19 @@
 class CommentModel {
   String? id;
+  String? parentCommentId; // NOVO: Para identificar a quem pertence o subcomentário
   final String userId;
   final String userName;
   final String userInitials;
   final String badge;
   final DateTime createdAt; 
-  final String text;
+  String text; // Deixou de ser final para podermos adicionar @ menções
   int votes; 
   bool isSolution; 
   final List<CommentModel> replies;
 
   CommentModel({
     this.id,
+    this.parentCommentId,
     required this.userId,
     required this.userName,
     required this.userInitials,
@@ -33,6 +35,8 @@ class CommentModel {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id, // Guarda o ID gerado no array
+      'parentCommentId': parentCommentId, // Guarda o pai
       'userId': userId,
       'userName': userName,
       'userInitials': userInitials,
@@ -47,7 +51,8 @@ class CommentModel {
 
   factory CommentModel.fromMap(Map<String, dynamic> map, String docId) {
     return CommentModel(
-      id: docId,
+      id: map['id'] ?? docId, // Aproveita o ID do map se existir (útil para os arrays)
+      parentCommentId: map['parentCommentId'],
       userId: map['userId'] ?? '',
       userName: map['userName'] ?? '',
       userInitials: map['userInitials'] ?? '',
@@ -57,7 +62,7 @@ class CommentModel {
       votes: map['votes'] ?? 0,
       isSolution: map['isSolution'] ?? false,
       replies: map['replies'] != null 
-          ? List<CommentModel>.from((map['replies'] as List).map((x) => CommentModel.fromMap(x, '')))
+          ? List<CommentModel>.from((map['replies'] as List).map((x) => CommentModel.fromMap(x, x['id'] ?? '')))
           : [],
     );
   }
