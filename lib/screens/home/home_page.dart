@@ -323,15 +323,6 @@ class _HomePageState extends State<HomePage> {
           ),
           _buildLightDivider(),
           DrawerMenuItem(
-            icon: Icons.history,
-            title: "Histórico",
-            onTap: () => _showInfoSheet(
-              title: 'Histórico',
-              message: 'O histórico será ligado a uma página própria.',
-            ),
-          ),
-          _buildLightDivider(),
-          DrawerMenuItem(
             icon: Icons.settings_outlined,
             title: "Definições",
             onTap: () {
