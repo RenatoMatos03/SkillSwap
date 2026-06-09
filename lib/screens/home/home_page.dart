@@ -169,7 +169,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Notícias',
+                  'Dicas',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -375,10 +375,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _openNewsItem(NewsItem item) {
-    if (item.tag == 'QUIZ') {
-      setState(() => _selectedIndex = 4);
-      return;
-    }
     _showInfoSheet(title: item.title, message: item.subtitle);
   }
 
@@ -454,7 +450,7 @@ class _HomePageState extends State<HomePage> {
               const SheetHandle(),
               const SizedBox(height: 16),
               const Text(
-                'Todas as notícias',
+                'Dicas',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

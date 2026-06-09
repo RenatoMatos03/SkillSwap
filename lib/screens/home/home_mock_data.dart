@@ -5,22 +5,24 @@ import 'home_models.dart';
 const List<NewsItem> homeNewsItems = [
   NewsItem(
     tag: 'QUIZ',
-    title: 'Quiz desta semana: Bases de Dados',
+    title: 'Ganha moedas com o Quiz Semanal',
     subtitle:
-        'Testa os teus conhecimentos sobre SQL, normalização e transações.',
-    date: '18 May 2026',
+        'Resolve o quiz todas as semanas e acumula moedas para trocares por explicações.',
+    date: '',
   ),
   NewsItem(
-    tag: 'PARCERIA',
-    title: 'Nova parceria com o Instituto Politécnico de Setúbal',
-    subtitle: 'Mais oportunidades e apoio para os teus projetos académicos.',
-    date: '19 May 2026',
+    tag: 'SWIPE',
+    title: 'Troca conhecimento na aba Match',
+    subtitle:
+        'Procura explicações no que precisas e oferece as tuas competências. Quando chegares a acordo, envia as moedas na aba Mensagens através dos 3 pontos no canto superior direito.',
+    date: '',
   ),
   NewsItem(
-    tag: 'SISTEMA',
-    title: 'Sistema de moedas recebeu uma atualização',
-    subtitle: 'Dobra de moedas semanal e novas recompensas disponíveis.',
-    date: '20 May 2026',
+    tag: 'FÓRUM',
+    title: 'Usa o Fórum antes de gastar moedas',
+    subtitle:
+        'Consulta as dúvidas já respondidas na tua escola e ajuda outros estudantes respondendo às questões deles.',
+    date: '',
   ),
 ];
 
