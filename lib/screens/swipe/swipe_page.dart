@@ -26,83 +26,83 @@ class _SwipePageState extends State<SwipePage> {
   Future<void> _fetchUsers() async {
     try {
       final currentUserAuth = FirebaseAuth.instance.currentUser;
-      if (currentUserAuth == null) {
-        throw Exception("Nenhum utilizador com login feito.");
-      }
+      if (currentUserAuth == null) return;
+
       final myUid = currentUserAuth.uid;
 
+      // Busca o meu perfil para saber o que preciso
       final myDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(myUid)
           .get();
-      if (!myDoc.exists) {
-        throw Exception("O meu perfil não foi encontrado na base de dados.");
-      }
+      if (!myDoc.exists) return;
 
       final myProfile = UserProfile.fromMap(myDoc.id, myDoc.data()!);
-      final myNeeds = myProfile.tagsProcura;
-
-      final myNeedsNormalized = myNeeds
-          .map((tag) => tag.trim().toLowerCase())
+      final myNeedsNormalized = myProfile.tagsProcura
+          .map((t) => t.trim().toLowerCase())
           .toList();
 
+      // Busca todos os utilizadores
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .get();
-      final allUsers = snapshot.docs.map((doc) {
-        return UserProfile.fromMap(doc.id, doc.data());
-      }).toList();
+      final allUsers = snapshot.docs
+          .map((doc) => UserProfile.fromMap(doc.id, doc.data()))
+          .toList();
 
+      // Filtra apenas quem oferece o que eu preciso e não sou eu
       final matchedUsers = allUsers.where((otherUser) {
         if (otherUser.uid == myUid) return false;
         if (myNeedsNormalized.isEmpty) return false;
 
-        bool hasMatch = otherUser.tagsOferta.any((tagDeles) {
-          String tagNormalizada = tagDeles.trim().toLowerCase();
-          return myNeedsNormalized.contains(tagNormalizada);
-        });
-
-        return hasMatch;
+        return otherUser.tagsOferta.any(
+          (tag) => myNeedsNormalized.contains(tag.trim().toLowerCase()),
+        );
       }).toList();
 
-      setState(() {
-        _profiles = matchedUsers;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _profiles = matchedUsers;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      print("Erro ao carregar do Firebase: $e");
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _onPanEnd(DragEndDetails details) {
-    if (_profiles.isEmpty) return;
+    if (_profiles.isEmpty || _currentIndex >= _profiles.length) return;
 
     const double velocityThreshold = 300.0;
     double dx = details.velocity.pixelsPerSecond.dx;
     double dy = details.velocity.pixelsPerSecond.dy;
 
+    // Swipe para cima -> MATCH!
     if (dy < -velocityThreshold && dy.abs() > dx.abs()) {
-      if (_currentIndex < _profiles.length) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                MatchPage(phoneNumber: _profiles[_currentIndex].phoneNumber),
-          ),
-        );
-      }
-    } else if (dx > velocityThreshold) {
-      setState(() {
-        if (_currentIndex < _profiles.length) {
-          _currentIndex++;
-        }
+      final matchedUser = _profiles[_currentIndex];
+      final myUid = FirebaseAuth.instance.currentUser!.uid;
+
+      // 🔥 GRAVA O MATCH NO FIREBASE
+      FirebaseFirestore.instance.collection('users').doc(myUid).update({
+        'matches': FieldValue.arrayUnion([matchedUser.uid]),
       });
-    } else if (dx < -velocityThreshold) {
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MatchPage(profileName: matchedUser.name),
+        ),
+      ).then((_) {
+        setState(() {
+          _currentIndex++;
+        });
+      });
+    }
+    // Swipe para direita/esquerda -> SKIP
+    else if (dx.abs() > velocityThreshold) {
       setState(() {
-        if (_currentIndex > 0) {
-          _currentIndex--;
-        }
+        _currentIndex++;
       });
     }
   }
@@ -115,23 +115,12 @@ class _SwipePageState extends State<SwipePage> {
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF009191)),
             )
-          : _profiles.isEmpty
-          ? const Center(
-              child: Text(
-                "Não há estudantes compatíveis no momento.",
-                style: TextStyle(color: Colors.black87, fontSize: 16),
-              ),
-            )
+          : _profiles.isEmpty || _currentIndex >= _profiles.length
+          ? _buildEndOfListMessage()
           : GestureDetector(
               onPanEnd: _onPanEnd,
               behavior: HitTestBehavior.opaque,
-              child: Stack(
-                children: [
-                  _currentIndex >= _profiles.length
-                      ? _buildEndOfListMessage()
-                      : StudentCard(profile: _profiles[_currentIndex]),
-                ],
-              ),
+              child: StudentCard(profile: _profiles[_currentIndex]),
             ),
     );
   }
@@ -145,17 +134,9 @@ class _SwipePageState extends State<SwipePage> {
           SizedBox(height: 16),
           Text(
             "Chegaste ao fim!",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 8),
-          Text(
-            "Viste todos os estudantes compatíveis.",
-            style: TextStyle(color: Colors.black54, fontSize: 16),
-          ),
+          Text("Viste todos os estudantes compatíveis."),
         ],
       ),
     );

@@ -19,6 +19,7 @@ class UserProfile {
   final String photoUrl;
   final double rating;
   final bool showCoinsInProfile;
+  final List<String> matches;
 
   UserProfile({
     required this.uid,
@@ -39,6 +40,7 @@ class UserProfile {
     this.photoUrl = '',
     this.rating = 0.0,
     this.showCoinsInProfile = true,
+    this.matches = const [],
   });
 
   factory UserProfile.fromMap(String uid, Map<String, dynamic> map) {
@@ -61,6 +63,7 @@ class UserProfile {
       photoUrl: map['photoUrl'] ?? '',
       rating: (map['rating'] ?? 0).toDouble(),
       showCoinsInProfile: map['showCoinsInProfile'] ?? true,
+      matches: List<String>.from(map['matches'] ?? []),
     );
   }
 
@@ -83,6 +86,7 @@ class UserProfile {
       'photoUrl': photoUrl,
       'rating': rating,
       'showCoinsInProfile': showCoinsInProfile,
+      'matches': matches,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }

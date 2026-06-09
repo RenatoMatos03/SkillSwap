@@ -10,6 +10,7 @@ import 'home_models.dart';
 import '../forum/forum_schools_page.dart';
 import '../swipe/swipe_page.dart';
 import '../profile/profile_page.dart';
+import '../messages/messages_page.dart';
 import '../../utils/string_utils.dart';
 import '../../widgets/profile/profile_widgets.dart';
 import '../../widgets/widgets.dart';
@@ -25,11 +26,12 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   int _newsIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final PageController _newsPageController = PageController(viewportFraction: 0.92);
+  final PageController _newsPageController = PageController(
+    viewportFraction: 0.92,
+  );
   final _userService = UserService();
-
-  // Chave para controlar a navegação exclusiva do Fórum
-  final GlobalKey<NavigatorState> _forumNavigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _forumNavigatorKey =
+      GlobalKey<NavigatorState>();
 
   UserProfile? _profile;
   bool _showingProfile = false;
@@ -64,9 +66,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.cardBackground,
-      // Menu Lateral
       drawer: _buildDrawer(),
-      // Navbar Superior
       appBar: AppBar(
         backgroundColor: AppColors.cardBackground,
         elevation: 0,
@@ -98,20 +98,19 @@ class _HomePageState extends State<HomePage> {
               index: _selectedIndex,
               children: [
                 _buildHomeContent(),
-                SwipePage(),
-                const Center(child: Text('Mensagens Content')),
+                const SwipePage(),
+                const MessagesPage(), // 🔥 AQUI ESTÁ A TUA PÁGINA
                 Navigator(
                   key: _forumNavigatorKey,
                   onGenerateRoute: (settings) {
                     return MaterialPageRoute(
-                      builder: (context) => ForumSchoolsPage(),
+                      builder: (context) => const ForumSchoolsPage(),
                     );
                   },
                 ),
                 const QuizHomeView(),
               ],
             ),
-      // Navbar Inferior
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() {
@@ -157,7 +156,8 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HomeGreetingCard(
-              greeting: 'Olá, ${_profile?.name.split(' ').first ?? 'utilizador'} 👋',
+              greeting:
+                  'Olá, ${_profile?.name.split(' ').first ?? 'utilizador'} 👋',
               streakText: _getStreakText(_profile?.streak ?? 0),
             ),
             const SizedBox(height: 18),
@@ -288,8 +288,13 @@ class _HomePageState extends State<HomePage> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        _profile != null ? '${_profile!.course} · ${_profile!.academicYear}' : '',
-                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                        _profile != null
+                            ? '${_profile!.course} · ${_profile!.academicYear}'
+                            : '',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -298,7 +303,6 @@ class _HomePageState extends State<HomePage> {
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
-                  tooltip: 'Fechar menu',
                 ),
               ],
             ),
@@ -319,8 +323,7 @@ class _HomePageState extends State<HomePage> {
             title: "Histórico",
             onTap: () => _showInfoSheet(
               title: 'Histórico',
-              message:
-                  'O histórico será ligado a uma página própria numa próxima fase.',
+              message: 'O histórico será ligado a uma página própria.',
             ),
           ),
           _buildLightDivider(),
@@ -372,7 +375,6 @@ class _HomePageState extends State<HomePage> {
       setState(() => _selectedIndex = 4);
       return;
     }
-
     _showInfoSheet(title: item.title, message: item.subtitle);
   }
 
@@ -387,38 +389,36 @@ class _HomePageState extends State<HomePage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SheetHandle(),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SheetHandle(),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
-              const SizedBox(height: 10),
-              Text(
-                message,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                  height: 1.4,
-                ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              message,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                height: 1.4,
               ),
-              const SizedBox(height: 18),
-              const SheetCloseButton(),
-            ],
-          ),
-        );
-      },
+            ),
+            const SizedBox(height: 18),
+            const SheetCloseButton(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -430,60 +430,52 @@ class _HomePageState extends State<HomePage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SheetHandle(),
-                const SizedBox(height: 16),
-                const Text(
-                  'Todas as notícias',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SheetHandle(),
+              const SizedBox(height: 16),
+              const Text(
+                'Todas as notícias',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
-                const SizedBox(height: 12),
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: _newsItems.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final item = _newsItems[index];
-                      return HomeNewsCard(
-                        item: item,
-                        onTap: () {
-                          Navigator.pop(context);
-                          _openNewsItem(item);
-                        },
-                      );
+              ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: _newsItems.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (ctx, i) => HomeNewsCard(
+                    item: _newsItems[i],
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _openNewsItem(_newsItems[i]);
                     },
                   ),
                 ),
-                const SizedBox(height: 16),
-                const SheetCloseButton(),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              const SheetCloseButton(),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Widget _buildLightDivider() {
-    return const Column(
-      children: [
-        SizedBox(height: 6),
-        Divider(color: AppColors.dividerLight, thickness: 1),
-        SizedBox(height: 6),
-      ],
-    );
-  }
+  Widget _buildLightDivider() => const Column(
+    children: [
+      SizedBox(height: 6),
+      Divider(color: AppColors.dividerLight, thickness: 1),
+      SizedBox(height: 6),
+    ],
+  );
 }

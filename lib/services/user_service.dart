@@ -46,12 +46,40 @@ class UserService {
     if (academicYear != null) data['academicYear'] = academicYear;
     if (tagsOferta != null) data['tagsOferta'] = tagsOferta;
     if (tagsProcura != null) data['tagsProcura'] = tagsProcura;
-    if (showCoinsInProfile != null) data['showCoinsInProfile'] = showCoinsInProfile;
+    if (showCoinsInProfile != null)
+      data['showCoinsInProfile'] = showCoinsInProfile;
     if (data.isEmpty) return;
     await _db.collection('users').doc(uid).update(data);
   }
 
   Future<void> deleteUserData(String uid) async {
     await _db.collection('users').doc(uid).delete();
+  }
+
+  // 🔥 A FUNÇÃO DE TRANSFERÊNCIA DE MOEDAS QUE A MENSAGENS PAGE PRECISA
+  Future<void> transferCoins({
+    required String senderUid,
+    required String receiverUid,
+    required int amount,
+  }) async {
+    final myRef = _db.collection('users').doc(senderUid);
+    final theirRef = _db.collection('users').doc(receiverUid);
+
+    await _db.runTransaction((transaction) async {
+      final mySnapshot = await transaction.get(myRef);
+      if (!mySnapshot.exists)
+        throw Exception("O teu perfil não foi encontrado.");
+
+      final myCurrentCoins = mySnapshot.data()?['coins'] ?? 0;
+
+      if (myCurrentCoins < amount) {
+        throw Exception(
+          "Saldo insuficiente! Tens apenas $myCurrentCoins moedas.",
+        );
+      }
+
+      transaction.update(myRef, {'coins': myCurrentCoins - amount});
+      transaction.update(theirRef, {'coins': FieldValue.increment(amount)});
+    });
   }
 }
