@@ -98,7 +98,7 @@ class MessagesPage extends StatelessWidget {
                     final myUid = FirebaseAuth.instance.currentUser?.uid;
                     if (amount > 0 && myUid != null) {
                       try {
-                        await UserService().transferCoinsAndRate(
+                        await UserService().transferCoins(
                           senderUid: myUid,
                           receiverUid: otherUser.uid,
                           amount: amount,
