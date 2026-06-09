@@ -23,11 +23,13 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final _userService = UserService();
   late bool _showCoins;
+  late bool _defaultAnonymousMode;
 
   @override
   void initState() {
     super.initState();
     _showCoins = widget.profile.showCoinsInProfile;
+    _defaultAnonymousMode = widget.profile.defaultAnonymousMode;
   }
 
   Future<void> _toggleShowCoins(bool value) async {
@@ -35,6 +37,15 @@ class _SettingsPageState extends State<SettingsPage> {
     await _userService.updateProfile(
       uid: widget.profile.uid,
       showCoinsInProfile: value,
+    );
+    widget.onSettingsChanged();
+  }
+
+  Future<void> _toggleAnonymousMode(bool value) async {
+    setState(() => _defaultAnonymousMode = value);
+    await _userService.updateProfile(
+      uid: widget.profile.uid,
+      defaultAnonymousMode: value,
     );
     widget.onSettingsChanged();
   }
@@ -157,6 +168,15 @@ class _SettingsPageState extends State<SettingsPage> {
               title: 'Mostrar Moedas no Perfil',
               value: _showCoins,
               onChanged: _toggleShowCoins,
+            ),
+            const SettingsDivider(),
+            SettingsSwitchTile(
+              icon: Icons.visibility_off_outlined,
+              iconBg: const Color(0xFFEDE7F6),
+              iconColor: const Color(0xFF5E35B1),
+              title: 'Modo Anónimo por Defeito',
+              value: _defaultAnonymousMode,
+              onChanged: _toggleAnonymousMode,
             ),
           ]),
           const SizedBox(height: 28),

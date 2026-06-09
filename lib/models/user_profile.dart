@@ -10,6 +10,7 @@ class UserProfile {
   final String academicYear;
   final List<String> tagsProcura;
   final List<String> tagsOferta;
+  final bool defaultAnonymousMode;
   final int coins;
   final int streak;
   final int helpsGiven;
@@ -18,7 +19,7 @@ class UserProfile {
   final String phoneNumber;
   final String photoUrl;
   final double rating;
-  final List<double> ratings; // 🔥 Nova lista para guardar todas as avaliações
+  final List<double> ratings;
   final bool showCoinsInProfile;
   final List<String> matches;
 
@@ -32,6 +33,7 @@ class UserProfile {
     required this.academicYear,
     required this.tagsProcura,
     required this.tagsOferta,
+    this.defaultAnonymousMode = false,
     this.coins = 0,
     this.streak = 0,
     this.helpsGiven = 0,
@@ -40,7 +42,7 @@ class UserProfile {
     this.phoneNumber = '',
     this.photoUrl = '',
     this.rating = 0.0,
-    this.ratings = const [], // 🔥 Inicialização da lista vazia
+    this.ratings = const [],
     this.showCoinsInProfile = true,
     this.matches = const [],
   });
@@ -56,6 +58,7 @@ class UserProfile {
       academicYear: map['academicYear'] ?? '',
       tagsProcura: List<String>.from(map['tagsProcura'] ?? []),
       tagsOferta: List<String>.from(map['tagsOferta'] ?? []),
+      defaultAnonymousMode: map['defaultAnonymousMode'] ?? false,
       coins: map['coins'] ?? 0,
       streak: map['streak'] ?? 0,
       helpsGiven: map['helpsGiven'] ?? 0,
@@ -64,7 +67,6 @@ class UserProfile {
       phoneNumber: map['phoneNumber'] ?? '',
       photoUrl: map['photoUrl'] ?? '',
       rating: (map['rating'] ?? 0).toDouble(),
-      // 🔥 Lê a lista do Firebase e garante que os números são convertidos para double
       ratings: List<double>.from(
         (map['ratings'] ?? []).map((x) => (x as num).toDouble()),
       ),
@@ -83,6 +85,7 @@ class UserProfile {
       'academicYear': academicYear,
       'tagsProcura': tagsProcura,
       'tagsOferta': tagsOferta,
+      'defaultAnonymousMode': defaultAnonymousMode,
       'coins': coins,
       'streak': streak,
       'helpsGiven': helpsGiven,
@@ -91,7 +94,7 @@ class UserProfile {
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'rating': rating,
-      'ratings': ratings, // 🔥 Guarda a lista no Firebase
+      'ratings': ratings,
       'showCoinsInProfile': showCoinsInProfile,
       'matches': matches,
       'createdAt': FieldValue.serverTimestamp(),

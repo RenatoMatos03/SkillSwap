@@ -36,6 +36,7 @@ class UserService {
     List<String>? tagsOferta,
     List<String>? tagsProcura,
     bool? showCoinsInProfile,
+    bool? defaultAnonymousMode
   }) async {
     final data = <String, dynamic>{};
     if (bio != null) data['bio'] = bio;
@@ -49,6 +50,7 @@ class UserService {
     if (showCoinsInProfile != null) {
       data['showCoinsInProfile'] = showCoinsInProfile;
     }
+    if (defaultAnonymousMode != null) data['defaultAnonymousMode'] = defaultAnonymousMode;
     if (data.isEmpty) return;
     await _db.collection('users').doc(uid).update(data);
   }

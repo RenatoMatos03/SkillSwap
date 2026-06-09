@@ -27,6 +27,22 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadUserPreferences(); // Carrega a preferência ao abrir
+  }
+
+  // NOVO MÉTODO
+  Future<void> _loadUserPreferences() async {
+    final profile = await UserService().getUserProfile();
+    if (profile != null && mounted) {
+      setState(() {
+        _isAnonymous = profile.defaultAnonymousMode;
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _tagController.dispose();
     _titleController.dispose();
@@ -78,7 +94,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
         description: _descController.text.trim(),
         status: "Aberta",
         userName: _isAnonymous ? "Anónimo" : (profile?.name ?? "Utilizador"),
-        // CHAMA A FUNÇÃO GLOBAL AQUI
         userInitials: _isAnonymous ? "A" : (profile != null ? getInitials(profile.name) : "U"),
         userCourse: _isAnonymous ? "Anónimo" : (profile?.course ?? "IPS"),
         commentsCount: 0,
