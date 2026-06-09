@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/user_profile.dart';
 import '../../services/user_service.dart';
-// 🔥 Importa a tua página de perfil existente
 import '../profile/profile_page.dart';
 
 class MessagesPage extends StatelessWidget {
@@ -45,49 +44,79 @@ class MessagesPage extends StatelessWidget {
 
   void _showGiveCoinsDialog(BuildContext context, UserProfile otherUser) {
     final TextEditingController amountController = TextEditingController();
+    double currentRating = 5.0;
+
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text("Dar moedas a ${otherUser.name.split(' ').first}"),
-          content: TextField(
-            controller: amountController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: "Quantidade",
-              prefixIcon: Icon(Icons.copyright),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("Cancelar"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final amount = int.tryParse(amountController.text) ?? 0;
-                final myUid = FirebaseAuth.instance.currentUser?.uid;
-                if (amount > 0 && myUid != null) {
-                  try {
-                    await UserService().transferCoins(
-                      senderUid: myUid,
-                      receiverUid: otherUser.uid,
-                      amount: amount,
-                    );
-                    if (dialogContext.mounted) Navigator.pop(dialogContext);
-                  } catch (e) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(e.toString())));
-                  }
-                }
-              },
-              child: const Text("Enviar"),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text("Avaliar ${otherUser.name.split(' ').first}"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min, // Para não ocupar o ecrã todo
+                children: [
+                  TextField(
+                    controller: amountController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      hintText: "Quantidade de moedas",
+                      prefixIcon: Icon(Icons.copyright),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    "Avaliação: ${currentRating.toInt()} estrelas",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Slider(
+                    value: currentRating,
+                    min: 1,
+                    max: 5,
+                    divisions: 4,
+                    activeColor: Colors.amber, // Cor das estrelinhas
+                    label: currentRating.toInt().toString(),
+                    onChanged: (val) {
+                      setDialogState(() {
+                        currentRating = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final amount = int.tryParse(amountController.text) ?? 0;
+                    final myUid = FirebaseAuth.instance.currentUser?.uid;
+                    if (amount > 0 && myUid != null) {
+                      try {
+                        await UserService().transferCoinsAndRate(
+                          senderUid: myUid,
+                          receiverUid: otherUser.uid,
+                          amount: amount,
+                          rating: currentRating,
+                        );
+                        if (dialogContext.mounted) Navigator.pop(dialogContext);
+                      } catch (e) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(e.toString())));
+                      }
+                    }
+                  },
+                  child: const Text("Enviar"),
+                ),
+              ],
+            );
+          },
         );
       },
     );

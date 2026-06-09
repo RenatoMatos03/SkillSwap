@@ -46,8 +46,9 @@ class UserService {
     if (academicYear != null) data['academicYear'] = academicYear;
     if (tagsOferta != null) data['tagsOferta'] = tagsOferta;
     if (tagsProcura != null) data['tagsProcura'] = tagsProcura;
-    if (showCoinsInProfile != null)
+    if (showCoinsInProfile != null) {
       data['showCoinsInProfile'] = showCoinsInProfile;
+    }
     if (data.isEmpty) return;
     await _db.collection('users').doc(uid).update(data);
   }
@@ -56,19 +57,27 @@ class UserService {
     await _db.collection('users').doc(uid).delete();
   }
 
-  // 🔥 A FUNÇÃO DE TRANSFERÊNCIA DE MOEDAS QUE A MENSAGENS PAGE PRECISA
-  Future<void> transferCoins({
+  // 🔥 FUNÇÃO ATUALIZADA: TRANSFERE MOEDAS E ADICIONA RATING
+  Future<void> transferCoinsAndRate({
     required String senderUid,
     required String receiverUid,
     required int amount,
+    required double rating,
   }) async {
     final myRef = _db.collection('users').doc(senderUid);
     final theirRef = _db.collection('users').doc(receiverUid);
 
     await _db.runTransaction((transaction) async {
+      // 1. LER OS DADOS PRIMEIRO (Regra de ouro das Transactions no Firebase)
       final mySnapshot = await transaction.get(myRef);
-      if (!mySnapshot.exists)
+      final theirSnapshot = await transaction.get(theirRef);
+
+      if (!mySnapshot.exists) {
         throw Exception("O teu perfil não foi encontrado.");
+      }
+      if (!theirSnapshot.exists) {
+        throw Exception("O perfil do destinatário não foi encontrado.");
+      }
 
       final myCurrentCoins = mySnapshot.data()?['coins'] ?? 0;
 
@@ -78,8 +87,24 @@ class UserService {
         );
       }
 
+      // 2. CALCULAR A NOVA MÉDIA DE RATING
+      final List<dynamic> currentRatings = theirSnapshot.data()?['ratings'] ?? [];
+      List<double> updatedRatings = currentRatings.map((e) => (e as num).toDouble()).toList();
+      updatedRatings.add(rating); // Adiciona a nova avaliação
+
+      double sum = updatedRatings.fold(0.0, (prev, element) => prev + element);
+      double newAverage = sum / updatedRatings.length;
+
+      // 3. FAZER AS ESCRITAS
+      // Retira moedas do remetente
       transaction.update(myRef, {'coins': myCurrentCoins - amount});
-      transaction.update(theirRef, {'coins': FieldValue.increment(amount)});
+      
+      // Adiciona moedas, guarda a avaliação na lista e atualiza a média do destinatário
+      transaction.update(theirRef, {
+        'coins': FieldValue.increment(amount),
+        'ratings': FieldValue.arrayUnion([rating]),
+        'rating': newAverage,
+      });
     });
   }
 }
