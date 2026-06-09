@@ -147,11 +147,11 @@ class MessagesPage extends StatelessWidget {
             .doc(myUid)
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData || !snapshot.data!.exists)
             return const Center(child: CircularProgressIndicator());
 
           final myMatchesUids = List<String>.from(
-            (snapshot.data!.data() as Map)['matches'] ?? [],
+            (snapshot.data!.data() as Map<String, dynamic>?)?['matches'] ?? [],
           );
           if (myMatchesUids.isEmpty)
             return const Center(child: Text("Ainda sem ligações."));
