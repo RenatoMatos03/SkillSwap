@@ -26,13 +26,12 @@ class CommentInput extends StatelessWidget {
       ),
       child: SafeArea(
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Ocupa o mínimo de espaço possível
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // --- HEADER DE RESPOSTA (Só aparece se estiveres a responder a alguém) ---
             if (replyingTo != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                color: const Color(0xFFE0F2F1), // Cor de fundo suave (tema da escola)
+                color: const Color(0xFFE0F2F1),
                 child: Row(
                   children: [
                     const Icon(Icons.reply, size: 14, color: Color(0xFF009191)),

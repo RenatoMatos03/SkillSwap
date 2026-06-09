@@ -1,12 +1,13 @@
+// Exporta todos os widgets específicos do Fórum
+export 'comment_input.dart';
+export 'comment_item.dart';
 export 'course_card.dart';
 export 'custom_badge.dart';
 export 'filter_components.dart';
+export 'forum_app_bar.dart';
 export 'forum_page_header.dart';
 export 'question_card.dart';
+export 'question_full_body.dart';
 export 'school_card.dart';
 export 'search_and_filter_bar.dart';
 export 'top_filter_dialog.dart';
-export 'comment_item.dart';
-export 'attached_file_card.dart';
-export 'comment_input.dart';
-export 'question_full_body.dart';

@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // <--- NOVO IMPORT
-import 'package:firebase_auth/firebase_auth.dart';     // <--- NOVO IMPORT
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_tokens.dart';
 
 class AppBalanceChip extends StatelessWidget {
   final VoidCallback? onTap;
 
-  // Removi o "value" daqui, pois ele agora lê sempre do Firebase automaticamente!
   const AppBalanceChip({super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
 
-    // STREAM BUILDER: Fica à escuta das moedas deste utilizador
     return StreamBuilder<DocumentSnapshot>(
       stream: currentUser != null 
           ? FirebaseFirestore.instance.collection('users').doc(currentUser.uid).snapshots()
@@ -46,7 +44,7 @@ class AppBalanceChip extends StatelessWidget {
                   const Icon(Icons.copyright, size: 18, color: AppColors.primary),
                   const SizedBox(width: 6),
                   Text(
-                    displayValue, // <--- MOSTRA O VALOR EM TEMPO REAL
+                    displayValue,
                     style: const TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,

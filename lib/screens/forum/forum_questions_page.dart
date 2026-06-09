@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/forum/question.dart';
 import '../../services/forum_service.dart';
-import '../../widgets/forum/widgets_forum.dart'; 
-import 'forum_question_details_page.dart'; 
-import 'forum_create_question_page.dart'; 
+import '../../widgets/forum/widgets_forum.dart';
+import 'forum_question_details_page.dart';
+import 'forum_create_question_page.dart';
 
 class ForumQuestionsPage extends StatefulWidget {
   final String subjectName;
@@ -55,7 +55,6 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
           _selectedState = tempState;
           _selectedPub = tempPub;
         });
-        // Removido o Navigator.pop(context) daqui! O componente já se fecha sozinho.
       },
       onClear: () {
         setState(() {
@@ -63,7 +62,6 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
           _selectedState = "Todos";
           _selectedPub = "Todos";
         });
-        // Removido o Navigator.pop(context) daqui!
       },
       content: StatefulBuilder(
         builder: (BuildContext context, StateSetter setModalState) {

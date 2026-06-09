@@ -18,7 +18,6 @@ class ForumSchoolsPage extends StatelessWidget {
           children: [
             const SizedBox(height: 16),
             Expanded(
-              // LÊ AS ESCOLAS DIRETAMENTE DO FIREBASE
               child: StreamBuilder<List<School>>(
                 stream: ForumService().getSchoolsStream(),
                 builder: (context, snapshot) {

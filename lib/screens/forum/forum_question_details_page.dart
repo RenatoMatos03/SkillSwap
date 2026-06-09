@@ -6,7 +6,6 @@ import '../../services/forum_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import '../../widgets/widgets.dart';
-import '../../widgets/custom_confirmation_dialog.dart';
 
 class ForumQuestionDetailsPage extends StatefulWidget {
   final Question question;
@@ -134,10 +133,8 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
             ),
           ),
           
-          // --- O MENU POP-UP (BALÃO) DOS 3 PONTOS ---
           if (isOwner)
             Theme(
-              // Remove o efeito de splash gigante ao redor do menu
               data: Theme.of(context).copyWith(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
@@ -147,7 +144,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                 color: Colors.white,
                 surfaceTintColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                offset: const Offset(0, 40), // Empurra o balão ligeiramente para baixo do ícone
+                offset: const Offset(0, 40),
                 onSelected: (value) {
                   if (value == 'delete') {
                     _showDeleteConfirmation();

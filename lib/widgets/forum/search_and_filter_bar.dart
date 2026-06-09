@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class SearchAndFilterBar extends StatelessWidget {
   final String hintText;
   final VoidCallback onFilterTap;
-  final ValueChanged<String>? onChanged; // <--- ADICIONADO PARA REATIVIDADE
+  final ValueChanged<String>? onChanged;
 
   const SearchAndFilterBar({
     super.key, 
     required this.hintText, 
     required this.onFilterTap,
-    this.onChanged, // <--- ADICIONADO
+    this.onChanged,
   });
 
   @override
@@ -18,7 +18,7 @@ class SearchAndFilterBar extends StatelessWidget {
       children: [
         Expanded(
           child: TextField(
-            onChanged: onChanged, // <--- LIGADO AQUI
+            onChanged: onChanged,
             decoration: InputDecoration(
               hintText: hintText,
               prefixIcon: const Icon(Icons.search, color: Colors.grey),

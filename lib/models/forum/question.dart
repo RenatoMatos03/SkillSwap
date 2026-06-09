@@ -14,7 +14,7 @@ class Question {
 
   Question({
     this.id,
-    required this.userId, // <--- NOVO
+    required this.userId,
     required this.subjectName,
     required this.title,
     required this.description,
@@ -37,7 +37,7 @@ class Question {
 
   Map<String, dynamic> toMap() {
     return {
-      'userId': userId, // <--- NOVO
+      'userId': userId,
       'subjectName': subjectName,
       'title': title,
       'description': description,
@@ -54,7 +54,7 @@ class Question {
   factory Question.fromMap(Map<String, dynamic> map, String docId) {
     return Question(
       id: docId,
-      userId: map['userId'] ?? '', // <--- NOVO
+      userId: map['userId'] ?? '',
       subjectName: map['subjectName'] ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',

@@ -1,6 +1,6 @@
 class CommentModel {
   String? id;
-  final String userId; // <--- NOVO
+  final String userId;
   final String userName;
   final String userInitials;
   final String badge;
@@ -12,7 +12,7 @@ class CommentModel {
 
   CommentModel({
     this.id,
-    required this.userId, // <--- NOVO
+    required this.userId,
     required this.userName,
     required this.userInitials,
     required this.badge,
@@ -33,7 +33,7 @@ class CommentModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'userId': userId, // <--- NOVO
+      'userId': userId,
       'userName': userName,
       'userInitials': userInitials,
       'badge': badge,
@@ -48,7 +48,7 @@ class CommentModel {
   factory CommentModel.fromMap(Map<String, dynamic> map, String docId) {
     return CommentModel(
       id: docId,
-      userId: map['userId'] ?? '', // <--- NOVO
+      userId: map['userId'] ?? '',
       userName: map['userName'] ?? '',
       userInitials: map['userInitials'] ?? '',
       badge: map['badge'] ?? '',

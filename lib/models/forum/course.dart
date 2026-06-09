@@ -6,7 +6,7 @@ class Course {
   final String acronym;
   final String name;
   final String type; 
-  final int questionsCount; // <--- AGORA É QUESTIONS COUNT
+  final int questionsCount;
   final String area;
   final Color color;
 
@@ -16,7 +16,7 @@ class Course {
     required this.acronym,
     required this.name,
     required this.type,
-    required this.questionsCount, // <--- ATUALIZADO
+    required this.questionsCount,
     required this.area,
     required this.color,
   });
@@ -27,7 +27,7 @@ class Course {
       'acronym': acronym,
       'name': name,
       'type': type,
-      'questionsCount': questionsCount, // <--- ATUALIZADO
+      'questionsCount': questionsCount,
       'area': area,
       'colorValue': color.value, 
     };

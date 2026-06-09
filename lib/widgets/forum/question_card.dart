@@ -4,7 +4,7 @@ import 'custom_badge.dart';
 
 class QuestionCard extends StatefulWidget {
   final Question question;
-  final VoidCallback onTap; // <-- O PARÂMETRO QUE FALTAVA!
+  final VoidCallback onTap;
 
   const QuestionCard({super.key, required this.question, required this.onTap});
 
@@ -47,13 +47,12 @@ class _QuestionCardState extends State<QuestionCard> {
             )
           ],
         ),
-        // ClipRRect garante que o splash do clique não sai dos cantos arredondados
         child: ClipRRect(
           borderRadius: borderRadius,
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: widget.onTap, // O clique é tratado aqui!
+              onTap: widget.onTap,
               hoverColor: Colors.grey.withOpacity(0.05),
               splashColor: const Color(0xFF009191).withOpacity(0.1),
               child: Padding(
@@ -72,7 +71,6 @@ class _QuestionCardState extends State<QuestionCard> {
                     const SizedBox(height: 8),
                     Text(widget.question.description, style: TextStyle(fontSize: 13, color: Colors.grey[600]), maxLines: 3, overflow: TextOverflow.ellipsis),
                     
-                    // As Tags são desenhadas aqui
                     if (widget.question.tags.isNotEmpty) ...[
                       const SizedBox(height: 12),
                       Wrap(

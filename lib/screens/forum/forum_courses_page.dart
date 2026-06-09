@@ -95,14 +95,14 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                     );
                   }
 
-                  // 1. Filtrar pela pesquisa
+                  // Filtrar pela pesquisa
                   List<Course> filtered = snapshot.data!.where((course) {
                     final searchLower = _searchQuery.toLowerCase();
                     return course.name.toLowerCase().contains(searchLower) ||
                            course.acronym.toLowerCase().contains(searchLower);
                   }).toList();
 
-                  // 2. Ordenação Combinada (Primeiro Grupo, Depois Ordem)
+                  // Ordenação Combinada (Primeiro Grupo, Depois Ordem)
                   filtered.sort((a, b) {
                     // Sort do Grupo
                     if (_selectedGroup == "Tipo de curso") {
@@ -150,17 +150,16 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                             bool showGroupHeader = false;
                             String groupTitle = "";
 
-                            // 3. Lógica para mostrar o Cabeçalho de Grupo
                             if (_selectedGroup != "Sem agrupamento") {
                               groupTitle = _selectedGroup == "Tipo de curso" ? course.type : course.area;
                               
                               if (index == 0) {
-                                showGroupHeader = true; // É o primeiro item, mostra sempre o grupo
+                                showGroupHeader = true;
                               } else {
                                 final prevCourse = filtered[index - 1];
                                 final prevGroupTitle = _selectedGroup == "Tipo de curso" ? prevCourse.type : prevCourse.area;
                                 if (groupTitle != prevGroupTitle) {
-                                  showGroupHeader = true; // O grupo mudou, mostra o título
+                                  showGroupHeader = true;
                                 }
                               }
                             }
@@ -176,12 +175,11 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                               },
                             );
 
-                            // Se precisarmos do cabeçalho, devolvemos a NOVA divisória + cartão
                             if (showGroupHeader) {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (index > 0) const SizedBox(height: 28), // Espaço extra antes de um novo grupo
+                                  if (index > 0) const SizedBox(height: 28),
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
@@ -191,11 +189,10 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                                           fontSize: 14,
                                           fontWeight: FontWeight.w900,
                                           color: Color(0xFF009191),
-                                          letterSpacing: 1.2, // Um pouco mais de espaço entre as letras
+                                          letterSpacing: 1.2,
                                         ),
                                       ),
                                       const SizedBox(width: 12),
-                                      // Esta é a nova linha de destaque (verde e mais grossa)
                                       Expanded(
                                         child: Container(
                                           height: 2,
@@ -212,8 +209,6 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                                 ],
                               );
                             }
-
-                            // Caso contrário, apenas o cartão
                             return courseCard;
                           },
                         ),

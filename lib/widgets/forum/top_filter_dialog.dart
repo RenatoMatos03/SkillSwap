@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets.dart'; // Importa o teu ficheiro geral com o AuthButton
+import '../widgets.dart';
 
 void showTopFilterDialog({
   required BuildContext context,
@@ -60,7 +60,7 @@ void showTopFilterDialog({
                           Expanded(
                             flex: 1,
                             child: SizedBox(
-                              height: 55, // Força a altura igual ao teu AuthButton
+                              height: 55,
                               child: OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -74,7 +74,6 @@ void showTopFilterDialog({
                         ],
                         Expanded(
                           flex: 2,
-                          // REUTILIZADO: O teu AuthButton original!
                           child: AuthButton(
                             text: applyButtonText,
                             onPressed: () {

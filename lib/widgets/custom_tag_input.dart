@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// O Campo de Texto + Botão "+"
 class CustomTagInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -25,7 +24,7 @@ class CustomTagInputField extends StatelessWidget {
             ),
             child: TextField(
               controller: controller,
-              onSubmitted: (_) => onAdd(), // Permite adicionar clicando no "Enter" do teclado
+              onSubmitted: (_) => onAdd(),
               decoration: InputDecoration(
                 hintText: hintText,
                 prefixIcon: const Icon(Icons.search, size: 20, color: Colors.grey),
@@ -58,7 +57,6 @@ class CustomTagInputField extends StatelessWidget {
   }
 }
 
-// O design da Tag em si ("Chip")
 class CustomTagChip extends StatelessWidget {
   final String label;
   final VoidCallback onRemove;

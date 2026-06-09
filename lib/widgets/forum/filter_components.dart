@@ -16,14 +16,14 @@ class FilterSectionTitle extends StatelessWidget {
 class FilterChipWidget extends StatelessWidget {
   final String label;
   final bool isSelected;
-  final VoidCallback onTap; // <--- ADICIONADO
+  final VoidCallback onTap;
 
   const FilterChipWidget({super.key, required this.label, this.isSelected = false, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // <--- ADICIONADO
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
@@ -46,14 +46,14 @@ class FilterChipWidget extends StatelessWidget {
 class FilterRadioOption extends StatelessWidget {
   final String label;
   final bool isSelected;
-  final VoidCallback onTap; // <--- ADICIONADO
+  final VoidCallback onTap;
 
   const FilterRadioOption({super.key, required this.label, this.isSelected = false, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap, // <--- ADICIONADO
+      onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -78,14 +78,14 @@ class FilterRadioOption extends StatelessWidget {
 class FilterCheckOption extends StatelessWidget {
   final String label;
   final bool isSelected;
-  final VoidCallback onTap; // <--- ADICIONADO
+  final VoidCallback onTap;
 
   const FilterCheckOption({super.key, required this.label, this.isSelected = false, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap, // <--- ADICIONADO
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 16),
         child: Row(

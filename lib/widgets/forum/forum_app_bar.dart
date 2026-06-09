@@ -11,8 +11,8 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      scrolledUnderElevation: 0, // <-- Remove o efeito cinzento no scroll
-      surfaceTintColor: Colors.transparent, // <-- Garante que o fundo fica sempre puro
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.black),
         onPressed: () => Navigator.pop(context),
@@ -23,7 +23,6 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       actions: const [
-        // AQUI: Removido o parâmetro "value"
         AppBalanceChip(), 
         SizedBox(width: 8),
         AppUserAvatar(initials: 'MR'),

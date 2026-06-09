@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/course.dart';
-import '../../models/forum/question.dart'; // <--- NOVO IMPORT
-import '../../services/forum_service.dart'; // <--- NOVO IMPORT
+import '../../models/forum/question.dart';
+import '../../services/forum_service.dart';
 import 'custom_badge.dart';
 
 class CourseCard extends StatefulWidget {
@@ -108,7 +108,6 @@ class _CourseCardState extends State<CourseCard> {
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      // --- AQUI ESTÁ A CONTAGEM DINÂMICA DE PERGUNTAS ---
                                       StreamBuilder<List<Question>>(
                                         stream: ForumService().getQuestionsStream(widget.course.acronym),
                                         builder: (context, snapshot) {
@@ -120,7 +119,6 @@ class _CourseCardState extends State<CourseCard> {
                                           );
                                         },
                                       ),
-                                      // ----------------------------------------------------
                                       const SizedBox(width: 8),
                                       CustomBadge(
                                         text: widget.course.area,

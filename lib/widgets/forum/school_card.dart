@@ -57,7 +57,6 @@ class _SchoolCardState extends State<SchoolCard> {
               ),
               const SizedBox(height: 12),
               
-              // --- AQUI ESTÁ A CONTAGEM DINÂMICA DE CURSOS ---
               StreamBuilder<List<Course>>(
                 stream: ForumService().getCoursesStream(widget.school.acronym),
                 builder: (context, snapshot) {
@@ -76,8 +75,6 @@ class _SchoolCardState extends State<SchoolCard> {
                   );
                 },
               ),
-              // ----------------------------------------------------
-              
             ],
           ),
         ),

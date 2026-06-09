@@ -5,7 +5,7 @@ import 'custom_badge.dart';
 class CommentItem extends StatelessWidget {
   final CommentModel comment;
   final Function(CommentModel) onReply;
-  final bool showAcceptButton; // <--- A NOVA VARIÁVEL LIMPA
+  final bool showAcceptButton;
   final VoidCallback onSolutionToggled;
 
   const CommentItem({
@@ -65,7 +65,7 @@ class CommentItem extends StatelessWidget {
               
               if (comment.isSolution)
                 const Row(children: [Icon(Icons.check, size: 16, color: Color(0xFF00E676)), SizedBox(width: 4), Text("Solução Aceite", style: TextStyle(color: Color(0xFF00E676), fontWeight: FontWeight.bold, fontSize: 12))])
-              else if (showAcceptButton) // <--- USA A VARIÁVEL AQUI
+              else if (showAcceptButton)
                 TextButton(
                   onPressed: onSolutionToggled, 
                   style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 0), tapTargetSize: MaterialTapTargetSize.shrinkWrap),

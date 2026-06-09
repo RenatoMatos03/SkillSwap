@@ -6,7 +6,6 @@ import '../../services/forum_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import '../../widgets/widgets.dart';
-import '../../widgets/custom_confirmation_dialog.dart';
 
 class ForumCreateQuestionPage extends StatefulWidget {
   final String subjectName; 
@@ -52,7 +51,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
     setState(() => _tags.remove(tag));
   }
 
-  // 1. FUNÇÃO QUE MOSTRA O POP-UP DE CONFIRMAÇÃO
   void _confirmPublish() {
     if (_titleController.text.trim().isEmpty || _descController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -71,7 +69,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
     );
   }
 
-  // 2. FUNÇÃO QUE EXECUTA A GRAVAÇÃO REAL NA BD
   Future<void> _executePublish() async {
     setState(() => _isLoading = true);
 
@@ -175,7 +172,6 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
 
             AuthButton(
               text: _isLoading ? "A publicar..." : "Publicar Pergunta",
-              // AGORA CHAMA A FUNÇÃO DO POP-UP
               onPressed: _isLoading ? null : _confirmPublish, 
             ),
             const Center(
