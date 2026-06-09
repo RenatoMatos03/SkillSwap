@@ -22,7 +22,7 @@ class HomeGreetingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.18),
+            color: AppColors.primary.withValues(alpha: 0.18),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -43,7 +43,7 @@ class HomeGreetingCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.14),
+              color: Colors.white.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(

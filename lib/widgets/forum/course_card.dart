@@ -30,7 +30,7 @@ class _CourseCardState extends State<CourseCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        transform: Matrix4.identity()..scaled(_isHovered ? 1.02 : 1.0, _isHovered ? 1.02 : 1.0, 1.0),
+        transform: Matrix4.diagonal3Values(_isHovered ? 1.02 : 1.0, _isHovered ? 1.02 : 1.0, 1.0),
         alignment: FractionalOffset.center,
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(

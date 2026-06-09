@@ -453,7 +453,7 @@ class _HomePageState extends State<HomePage> {
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: _newsItems.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (ctx, i) => HomeNewsCard(
                     item: _newsItems[i],
                     onTap: () {

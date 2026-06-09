@@ -97,6 +97,7 @@ class MessagesPage extends StatelessWidget {
                     final amount = int.tryParse(amountController.text) ?? 0;
                     final myUid = FirebaseAuth.instance.currentUser?.uid;
                     if (amount > 0 && myUid != null) {
+                      final messenger = ScaffoldMessenger.of(context);
                       try {
                         await UserService().transferCoins(
                           senderUid: myUid,
@@ -106,9 +107,7 @@ class MessagesPage extends StatelessWidget {
                         );
                         if (dialogContext.mounted) Navigator.pop(dialogContext);
                       } catch (e) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(e.toString())));
+                        messenger.showSnackBar(SnackBar(content: Text(e.toString())));
                       }
                     }
                   },
@@ -125,10 +124,11 @@ class MessagesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final myUid = FirebaseAuth.instance.currentUser?.uid;
-    if (myUid == null)
+    if (myUid == null) {
       return const Center(
         child: Text("Faz login para veres as tuas ligações."),
       );
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -147,14 +147,16 @@ class MessagesPage extends StatelessWidget {
             .doc(myUid)
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData || !snapshot.data!.exists)
+          if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Center(child: CircularProgressIndicator());
+          }
 
           final myMatchesUids = List<String>.from(
             (snapshot.data!.data() as Map<String, dynamic>?)?['matches'] ?? [],
           );
-          if (myMatchesUids.isEmpty)
+          if (myMatchesUids.isEmpty) {
             return const Center(child: Text("Ainda sem ligações."));
+          }
 
           return FutureBuilder<QuerySnapshot>(
             future: FirebaseFirestore.instance
@@ -165,8 +167,9 @@ class MessagesPage extends StatelessWidget {
                 )
                 .get(),
             builder: (context, matchSnapshot) {
-              if (!matchSnapshot.hasData)
+              if (!matchSnapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
+              }
 
               final profiles = matchSnapshot.data!.docs
                   .map(
@@ -179,7 +182,7 @@ class MessagesPage extends StatelessWidget {
 
               return ListView.separated(
                 itemCount: profiles.length,
-                separatorBuilder: (_, __) =>
+                separatorBuilder: (_, _) =>
                     const Divider(height: 1, indent: 70),
                 itemBuilder: (ctx, i) {
                   final p = profiles[i];

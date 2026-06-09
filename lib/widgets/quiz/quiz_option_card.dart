@@ -105,7 +105,7 @@ class QuizOptionCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (trailingIcon != null) trailingIcon,
+              ?trailingIcon,
             ],
           ),
         ),

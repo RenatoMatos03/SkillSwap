@@ -181,7 +181,7 @@ class _NotificationsSheetState extends State<_NotificationsSheet> {
                     return ListView.separated(
                       controller: scrollController,
                       itemCount: docs.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, _) => const Divider(height: 1),
                       itemBuilder: (context, i) {
                         final data = docs[i].data() as Map<String, dynamic>;
                         return _NotificationTile(data: data);

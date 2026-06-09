@@ -20,7 +20,7 @@ class ProfileAvatar extends StatelessWidget {
       radius: radius,
       backgroundColor: AppColors.primaryDark,
       backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-      onBackgroundImageError: photoUrl.isNotEmpty ? (_, __) {} : null,
+      onBackgroundImageError: photoUrl.isNotEmpty ? (_, _) {} : null,
       child: photoUrl.isEmpty
           ? Text(
               getInitials(name),

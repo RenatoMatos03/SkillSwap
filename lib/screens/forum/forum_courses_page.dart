@@ -197,7 +197,7 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                                         child: Container(
                                           height: 2,
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFF009191).withOpacity(0.3),
+                                            color: const Color(0xFF009191).withValues(alpha: 0.3),
                                             borderRadius: BorderRadius.circular(2),
                                           ),
                                         ),

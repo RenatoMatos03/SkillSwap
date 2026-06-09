@@ -39,7 +39,7 @@ class StudentCard extends StatelessWidget {
                 colors: [
                   Colors.transparent,
                   Colors.transparent,
-                  Colors.black.withOpacity(0.8),
+                  Colors.black.withValues(alpha: 0.8),
                   Colors.black,
                 ],
               ),

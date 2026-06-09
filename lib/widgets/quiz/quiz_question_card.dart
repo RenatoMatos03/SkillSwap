@@ -21,7 +21,7 @@ class QuizQuestionCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE6EAEE)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),

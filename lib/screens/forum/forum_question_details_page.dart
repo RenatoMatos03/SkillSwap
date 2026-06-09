@@ -140,7 +140,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                   children: [
                     Text(widget.question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)), 
                     if (acronym.isNotEmpty)
-                      CustomBadge(text: acronym, textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withOpacity(0.1))
+                      CustomBadge(text: acronym, textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withValues(alpha: 0.1))
                   ]
                 ),
                 const SizedBox(height: 6),

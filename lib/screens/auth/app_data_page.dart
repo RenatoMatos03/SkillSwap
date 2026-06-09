@@ -82,7 +82,7 @@ class _AppDataPageState extends State<AppDataPage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE0F2F1).withOpacity(0.5),
+                    color: const Color(0xFFE0F2F1).withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(color: const Color(0xFFB2DFDB), width: 0.5),
                   ),
@@ -130,6 +130,8 @@ class _AppDataPageState extends State<AppDataPage> {
                   text: _isLoading ? "A guardar..." : "Finalizar ✓",
                   onPressed: _isLoading ? null : () async {
                     setState(() => _isLoading = true);
+                    final navigator = Navigator.of(context);
+                    final messenger = ScaffoldMessenger.of(context);
                     try {
                       final uid = FirebaseAuth.instance.currentUser!.uid;
                       final email = FirebaseAuth.instance.currentUser!.email!;
@@ -148,14 +150,12 @@ class _AppDataPageState extends State<AppDataPage> {
                       );
                       await _userService.saveUserProfile(profile);
                       if (!mounted) return;
-                      Navigator.pushAndRemoveUntil(
-                        context,
+                      navigator.pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => const HomePage()),
                         (route) => false,
                       );
                     } catch (e) {
-                      if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         SnackBar(content: Text(e.toString())),
                       );
                     } finally {
