@@ -26,13 +26,17 @@ const List<NewsItem> homeNewsItems = [
 
 const List<LeaderboardItem> homeLeaderboardItems = [
   LeaderboardItem(
-    title: 'Top 10 — Mais Moedas',
+    title: 'Top 5 — Mais Moedas',
     subtitle: 'Ranking geral de moedas acumuladas',
     icon: Icons.workspace_premium_outlined,
+    field: 'coins',
+    valueSuffix: 'moedas',
   ),
   LeaderboardItem(
-    title: 'Top 10 — Quiz Semanal',
-    subtitle: 'Melhores resultados da semana',
+    title: 'Top 5 — Quizzes',
+    subtitle: 'Quem mais quizzes completou',
     icon: Icons.emoji_events_outlined,
+    field: 'quizzesDone',
+    valueSuffix: 'quizzes',
   ),
 ];

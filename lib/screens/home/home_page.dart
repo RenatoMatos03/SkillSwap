@@ -379,7 +379,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showLeaderboardDetails(LeaderboardItem item) {
-    _showInfoSheet(title: item.title, message: item.subtitle);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => LeaderboardSheet(
+        title: item.title,
+        field: item.field,
+        valueSuffix: item.valueSuffix,
+        icon: item.icon,
+      ),
+    );
   }
 
   void _showInfoSheet({required String title, required String message}) {

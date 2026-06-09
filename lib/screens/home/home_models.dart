@@ -18,11 +18,15 @@ class LeaderboardItem {
   final String title;
   final String subtitle;
   final IconData icon;
+  final String field;
+  final String valueSuffix;
 
   const LeaderboardItem({
     required this.title,
     required this.subtitle,
     required this.icon,
+    required this.field,
+    required this.valueSuffix,
   });
 }
 
