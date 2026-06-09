@@ -123,7 +123,7 @@ class _QuizResultPageState extends State<QuizResultPage> {
                         ),
                         const SizedBox(height: 10),
                         const Text(
-                          'Boa prestação! 🎉',
+                          'Quiz concluído!',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
