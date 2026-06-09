@@ -40,10 +40,10 @@ class _QuestionCardState extends State<QuestionCard> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(_isHovered ? 0.06 : 0.02), 
-              blurRadius: _isHovered ? 12 : 10,
-              spreadRadius: _isHovered ? 1 : 0,
-              offset: _isHovered ? const Offset(0, 4) : const Offset(0, 0),
+              color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.06),
+              blurRadius: _isHovered ? 20 : 10,
+              spreadRadius: _isHovered ? 2 : 0,
+              offset: _isHovered ? const Offset(0, 8) : const Offset(0, 3),
             )
           ],
         ),
