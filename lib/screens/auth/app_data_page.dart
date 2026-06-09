@@ -11,6 +11,7 @@ class AppDataPage extends StatefulWidget {
   final String school;
   final String course;
   final String academicYear;
+  final String phoneNumber;
 
   const AppDataPage({
     super.key,
@@ -19,6 +20,7 @@ class AppDataPage extends StatefulWidget {
     required this.school,
     required this.course,
     required this.academicYear,
+    required this.phoneNumber,
   });
 
   @override
@@ -141,6 +143,7 @@ class _AppDataPageState extends State<AppDataPage> {
                         academicYear: widget.academicYear,
                         tagsProcura: _tagsProcura,
                         tagsOferta: _tagsOferta,
+                        phoneNumber: widget.phoneNumber,
                       );
                       await _userService.saveUserProfile(profile);
                       if (!mounted) return;
@@ -195,7 +198,6 @@ class _AppDataPageState extends State<AppDataPage> {
         Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 13)),
         const SizedBox(height: 15),
         
-        // <--- AQUI USAMOS O NOVO WIDGET REUTILIZÁVEL (Input)
         CustomTagInputField(
           controller: controller,
           hintText: "Procurar tag...",
@@ -203,7 +205,6 @@ class _AppDataPageState extends State<AppDataPage> {
         ),
         const SizedBox(height: 15),
         
-        // <--- AQUI USAMOS O NOVO WIDGET REUTILIZÁVEL (Chips)
         Wrap(
           spacing: 8,
           runSpacing: 8,
