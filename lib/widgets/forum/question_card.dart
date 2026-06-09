@@ -27,7 +27,7 @@ class _QuestionCardState extends State<QuestionCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
+        transform: Matrix4.identity()..scaled(_isHovered ? 1.02 : 1.0, _isHovered ? 1.02 : 1.0, 1.0),
         alignment: FractionalOffset.center,
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
@@ -35,15 +35,15 @@ class _QuestionCardState extends State<QuestionCard> {
           borderRadius: borderRadius,
           border: Border.all(
             color: isResolved 
-              ? const Color(0xFF009191).withOpacity(_isHovered ? 0.6 : 0.3) 
-              : Colors.grey.withOpacity(_isHovered ? 0.4 : 0.2)
+              ? const Color(0xFF009191).withValues(alpha: _isHovered ? 0.6 : 0.3) 
+              : Colors.grey.withValues(alpha: _isHovered ? 0.4 : 0.2) // Corrigido
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.06),
-              blurRadius: _isHovered ? 20 : 10,
-              spreadRadius: _isHovered ? 2 : 0,
-              offset: _isHovered ? const Offset(0, 8) : const Offset(0, 3),
+              color: Colors.black.withValues(alpha: _isHovered ? 0.06 : 0.02), // Corrigido
+              blurRadius: _isHovered ? 12 : 10,
+              spreadRadius: _isHovered ? 1 : 0,
+              offset: _isHovered ? const Offset(0, 4) : const Offset(0, 0),
             )
           ],
         ),
@@ -53,8 +53,8 @@ class _QuestionCardState extends State<QuestionCard> {
             color: Colors.transparent,
             child: InkWell(
               onTap: widget.onTap,
-              hoverColor: Colors.grey.withOpacity(0.05),
-              splashColor: const Color(0xFF009191).withOpacity(0.1),
+              hoverColor: Colors.grey.withValues(alpha: 0.05),
+              splashColor: const Color(0xFF009191).withValues(alpha: 0.1),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(

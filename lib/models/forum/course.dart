@@ -29,7 +29,7 @@ class Course {
       'type': type,
       'questionsCount': questionsCount,
       'area': area,
-      'colorValue': color.value, 
+      'colorValue': color.toARGB32(), // Corrigido aqui
     };
   }
 
@@ -40,7 +40,7 @@ class Course {
       acronym: map['acronym'] ?? '',
       name: map['name'] ?? '',
       type: map['type'] ?? '',
-      questionsCount: map['questionsCount'] ?? 0, // <--- ATUALIZADO
+      questionsCount: map['questionsCount'] ?? 0,
       area: map['area'] ?? '',
       color: Color(map['colorValue'] ?? 0xFF00BFA5),
     );

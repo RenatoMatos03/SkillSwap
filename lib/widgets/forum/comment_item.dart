@@ -114,7 +114,7 @@ class _CommentItemState extends State<CommentItem> {
     Color downIconColor = isDownvoted ? Colors.grey[800]! : Colors.grey[500]!; 
     Color voteTextColor = isUpvoted ? brandColor : (isDownvoted ? Colors.grey[800]! : const Color(0xFF1D204B));
     Color voteBorderColor = isUpvoted ? brandColor : (isDownvoted ? Colors.grey[800]! : Colors.grey[300]!);
-    Color voteBgColor = isUpvoted ? brandColor.withOpacity(0.1) : (isDownvoted ? Colors.grey[200]! : Colors.transparent);
+    Color voteBgColor = isUpvoted ? brandColor.withValues(alpha: 0.1) : (isDownvoted ? Colors.grey[200]! : Colors.transparent);
 
     // CHAMA A FUNÇÃO GLOBAL AQUI
     String acronym = getCourseAcronym(widget.comment.badge);
@@ -268,7 +268,7 @@ class _CommentItemState extends State<CommentItem> {
               color: widget.comment.isSolution ? const Color(0xFFF2FCF3) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: widget.comment.isSolution ? const Color(0xFF00E676) : Colors.grey.withOpacity(0.2),
+                color: widget.comment.isSolution ? const Color(0xFF00E676) : Colors.grey.withValues(alpha: 0.2),
                 width: widget.comment.isSolution ? 1.5 : 1,
               ),
             ),

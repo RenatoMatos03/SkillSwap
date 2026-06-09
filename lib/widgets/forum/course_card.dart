@@ -20,8 +20,8 @@ class _CourseCardState extends State<CourseCard> {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(16.0);
-    final hoverColor = Colors.grey.withOpacity(0.05); 
-    final splashColor = widget.course.color.withOpacity(0.1); 
+    final hoverColor = Colors.grey.withValues(alpha: 0.05); 
+    final splashColor = widget.course.color.withValues(alpha: 0.1); 
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -30,7 +30,7 @@ class _CourseCardState extends State<CourseCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
+        transform: Matrix4.identity()..scaled(_isHovered ? 1.02 : 1.0, _isHovered ? 1.02 : 1.0, 1.0),
         alignment: FractionalOffset.center,
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
@@ -38,10 +38,10 @@ class _CourseCardState extends State<CourseCard> {
           borderRadius: borderRadius,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.06),
-              blurRadius: _isHovered ? 20 : 10,
-              spreadRadius: _isHovered ? 2 : 0,
-              offset: _isHovered ? const Offset(0, 8) : const Offset(0, 3),
+              color: Colors.black.withValues(alpha: _isHovered ? 0.08 : 0.03),
+              blurRadius: _isHovered ? 15 : 10,
+              spreadRadius: _isHovered ? 1 : 0,
+              offset: _isHovered ? const Offset(0, 5) : const Offset(0, 2),
             )
           ],
         ),
@@ -70,7 +70,7 @@ class _CourseCardState extends State<CourseCard> {
                               height: 45,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: widget.course.color.withOpacity(0.3), width: 2),
+                                border: Border.all(color: widget.course.color.withValues(alpha: 0.3), width: 2),
                               ),
                               alignment: Alignment.center,
                               child: Text(
@@ -123,7 +123,7 @@ class _CourseCardState extends State<CourseCard> {
                                       CustomBadge(
                                         text: widget.course.area,
                                         textColor: widget.course.color,
-                                        bgColor: widget.course.color.withOpacity(0.1),
+                                        bgColor: widget.course.color.withValues(alpha: 0.1),
                                       ),
                                     ],
                                   )
