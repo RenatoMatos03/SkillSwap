@@ -45,6 +45,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadProfile() async {
     final profile = await _userService.getUserProfile();
     if (mounted) setState(() => _profile = profile);
+    if (profile != null) {
+      _userService.maybeNotifyQuizAvailable(profile.uid);
+    }
   }
 
   String _getStreakText(int streak) {
@@ -78,6 +81,7 @@ class _HomePageState extends State<HomePage> {
           tooltip: 'Abrir menu',
         ),
         actions: [
+          const NotificationBell(),
           AppBalanceChip(
             onTap: () => _showInfoSheet(
               title: 'Saldo SkillSwap',

@@ -21,3 +21,4 @@ export 'settings_group.dart';
 export 'settings_tile.dart';
 export 'academic_year_dropdown.dart';
 export 'leaderboard_sheet.dart';
+export 'notification_bell.dart';

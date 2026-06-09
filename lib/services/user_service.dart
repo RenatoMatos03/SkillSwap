@@ -89,44 +89,83 @@ class UserService {
     final myRef = _db.collection('users').doc(senderUid);
     final theirRef = _db.collection('users').doc(receiverUid);
 
+    String senderName = '';
+
     await _db.runTransaction((transaction) async {
-      // 1. LER OS DADOS PRIMEIRO (Regra de ouro das Transactions no Firebase)
       final mySnapshot = await transaction.get(myRef);
       final theirSnapshot = await transaction.get(theirRef);
 
-      if (!mySnapshot.exists) {
-        throw Exception("O teu perfil não foi encontrado.");
-      }
-      if (!theirSnapshot.exists) {
-        throw Exception("O perfil do destinatário não foi encontrado.");
-      }
+      if (!mySnapshot.exists) throw Exception('O teu perfil não foi encontrado.');
+      if (!theirSnapshot.exists) throw Exception('O perfil do destinatário não foi encontrado.');
 
+      senderName = mySnapshot.data()?['name'] ?? 'Alguém';
       final myCurrentCoins = mySnapshot.data()?['coins'] ?? 0;
 
       if (myCurrentCoins < amount) {
-        throw Exception(
-          "Saldo insuficiente! Tens apenas $myCurrentCoins moedas.",
-        );
+        throw Exception('Saldo insuficiente! Tens apenas $myCurrentCoins moedas.');
       }
 
-      // 2. CALCULAR A NOVA MÉDIA DE RATING
       final List<dynamic> currentRatings = theirSnapshot.data()?['ratings'] ?? [];
-      List<double> updatedRatings = currentRatings.map((e) => (e as num).toDouble()).toList();
-      updatedRatings.add(rating); // Adiciona a nova avaliação
+      final updatedRatings = currentRatings.map((e) => (e as num).toDouble()).toList()..add(rating);
+      final newAverage = updatedRatings.fold(0.0, (p, e) => p + e) / updatedRatings.length;
 
-      double sum = updatedRatings.fold(0.0, (prev, element) => prev + element);
-      double newAverage = sum / updatedRatings.length;
-
-      // 3. FAZER AS ESCRITAS
-      // Retira moedas do remetente
       transaction.update(myRef, {'coins': myCurrentCoins - amount});
-      
-      // Adiciona moedas, guarda a avaliação na lista e atualiza a média do destinatário
       transaction.update(theirRef, {
         'coins': FieldValue.increment(amount),
         'ratings': FieldValue.arrayUnion([rating]),
         'rating': newAverage,
       });
     });
+
+    await _db
+        .collection('users')
+        .doc(receiverUid)
+        .collection('notifications')
+        .add({
+      'type': 'coins_received',
+      'senderName': senderName,
+      'coins': amount,
+      'read': false,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> maybeNotifyQuizAvailable(String uid) async {
+    final doc = await _db.collection('users').doc(uid).get();
+    if (!doc.exists) return;
+
+    final data = doc.data()!;
+    final lastQuizWeek = data['lastQuizWeek'] as String?;
+    final currentWeek = currentWeekKey();
+
+    // Only notify if the user has done a quiz before AND a new week started
+    if (lastQuizWeek == null || lastQuizWeek == currentWeek) return;
+
+    // Avoid duplicate notification for the same week
+    final lastNotifiedWeek = data['lastQuizNotifiedWeek'] as String?;
+    if (lastNotifiedWeek == currentWeek) return;
+
+    await _db.collection('users').doc(uid).collection('notifications').add({
+      'type': 'quiz_available',
+      'read': false,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    await _db.collection('users').doc(uid).update({
+      'lastQuizNotifiedWeek': currentWeek,
+    });
+  }
+
+  Future<void> markNotificationsRead(String uid) async {
+    final unread = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('notifications')
+        .where('read', isEqualTo: false)
+        .get();
+    final batch = _db.batch();
+    for (final doc in unread.docs) {
+      batch.update(doc.reference, {'read': true});
+    }
+    await batch.commit();
   }
 }
