@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../services/user_service.dart';
 import '../../widgets/quiz/quiz_widgets.dart';
 
-class QuizResultPage extends StatelessWidget {
+class QuizResultPage extends StatefulWidget {
   final int score;
   final int totalQuestions;
 
@@ -13,9 +15,29 @@ class QuizResultPage extends StatelessWidget {
   });
 
   @override
+  State<QuizResultPage> createState() => _QuizResultPageState();
+}
+
+class _QuizResultPageState extends State<QuizResultPage> {
+  @override
+  void initState() {
+    super.initState();
+    _save();
+  }
+
+  Future<void> _save() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    try {
+      await UserService().markQuizCompleted(uid: uid, score: widget.score);
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final incorrect = totalQuestions - score;
-    final percent = totalQuestions == 0 ? 0.0 : score / totalQuestions;
+    final incorrect = widget.totalQuestions - widget.score;
+    final percent =
+        widget.totalQuestions == 0 ? 0.0 : widget.score / widget.totalQuestions;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -34,7 +56,8 @@ class QuizResultPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.close, color: Color(0xFF1D204B)),
-            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+            onPressed: () =>
+                Navigator.popUntil(context, (route) => route.isFirst),
           ),
         ],
       ),
@@ -70,7 +93,8 @@ class QuizResultPage extends StatelessWidget {
                           color: Colors.white.withOpacity(0.18),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.emoji_events, color: Colors.amber, size: 26),
+                        child: const Icon(Icons.emoji_events,
+                            color: Colors.amber, size: 26),
                       ),
                     ),
                     Column(
@@ -86,7 +110,7 @@ class QuizResultPage extends StatelessWidget {
                           ),
                           child: Center(
                             child: Text(
-                              '$score/$totalQuestions',
+                              '${widget.score}/${widget.totalQuestions}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 28,
@@ -106,13 +130,14 @@ class QuizResultPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.16),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            '+ $score coins ganhas',
+                            '+ ${widget.score} coins ganhas',
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -165,7 +190,7 @@ class QuizResultPage extends StatelessWidget {
                 icon: Icons.check_circle_outline,
                 iconColor: const Color(0xFF009191),
                 label: 'Respostas corretas',
-                value: '$score',
+                value: '${widget.score}',
               ),
               QuizResultDetailRow(
                 icon: Icons.cancel_outlined,
@@ -177,22 +202,27 @@ class QuizResultPage extends StatelessWidget {
                 icon: Icons.emoji_events_outlined,
                 iconColor: const Color(0xFFF59E0B),
                 label: 'Coins ganhas',
-                value: '+$score',
+                value: '+${widget.score}',
               ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                  onPressed: () =>
+                      Navigator.popUntil(context, (route) => route.isFirst),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF009191),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                     elevation: 0,
                   ),
                   child: const Text(
                     'Voltar ao início',
-                    style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
