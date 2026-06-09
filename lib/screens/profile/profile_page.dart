@@ -71,10 +71,14 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            '${profile.course} · ${profile.academicYear} · ${profile.school}',
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
-            textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              '${profile.course} · ${profile.academicYear} · ${profile.school}',
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              textAlign: TextAlign.center,
+              softWrap: true,
+            ),
           ),
           const SizedBox(height: 10),
           _buildStarRating(profile.rating),
