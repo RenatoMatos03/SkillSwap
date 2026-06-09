@@ -18,6 +18,7 @@ class UserProfile {
   final String phoneNumber;
   final String photoUrl;
   final double rating;
+  final List<double> ratings; // 🔥 Nova lista para guardar todas as avaliações
   final bool showCoinsInProfile;
   final List<String> matches;
 
@@ -39,6 +40,7 @@ class UserProfile {
     this.phoneNumber = '',
     this.photoUrl = '',
     this.rating = 0.0,
+    this.ratings = const [], // 🔥 Inicialização da lista vazia
     this.showCoinsInProfile = true,
     this.matches = const [],
   });
@@ -62,6 +64,10 @@ class UserProfile {
       phoneNumber: map['phoneNumber'] ?? '',
       photoUrl: map['photoUrl'] ?? '',
       rating: (map['rating'] ?? 0).toDouble(),
+      // 🔥 Lê a lista do Firebase e garante que os números são convertidos para double
+      ratings: List<double>.from(
+        (map['ratings'] ?? []).map((x) => (x as num).toDouble()),
+      ),
       showCoinsInProfile: map['showCoinsInProfile'] ?? true,
       matches: List<String>.from(map['matches'] ?? []),
     );
@@ -85,6 +91,7 @@ class UserProfile {
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'rating': rating,
+      'ratings': ratings, // 🔥 Guarda a lista no Firebase
       'showCoinsInProfile': showCoinsInProfile,
       'matches': matches,
       'createdAt': FieldValue.serverTimestamp(),
