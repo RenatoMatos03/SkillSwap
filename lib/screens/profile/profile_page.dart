@@ -7,8 +7,14 @@ import 'edit_profile_page.dart';
 class ProfilePage extends StatelessWidget {
   final UserProfile profile;
   final VoidCallback? onProfileUpdated;
+  final bool readOnly;
 
-  const ProfilePage({super.key, required this.profile, this.onProfileUpdated});
+  const ProfilePage({
+    super.key,
+    required this.profile,
+    this.onProfileUpdated,
+    this.readOnly = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,25 +43,26 @@ class ProfilePage extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8, bottom: 16),
       child: Column(
         children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: IconButton(
-                icon: const Icon(Icons.edit_outlined, color: Colors.white),
-                tooltip: 'Editar perfil',
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditProfilePage(
-                      profile: profile,
-                      onSaved: onProfileUpdated ?? () {},
+          if (!readOnly)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: IconButton(
+                  icon: const Icon(Icons.edit_outlined, color: Colors.white),
+                  tooltip: 'Editar perfil',
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditProfilePage(
+                        profile: profile,
+                        onSaved: onProfileUpdated ?? () {},
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
           ProfileAvatar(
             name: profile.name,
             photoUrl: profile.photoUrl,

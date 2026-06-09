@@ -15,8 +15,9 @@ class PersonalDataPage extends StatefulWidget {
 class _PersonalDataPageState extends State<PersonalDataPage> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _anoController = TextEditingController();
   final _forumService = ForumService();
+
+  String? _selectedYear;
 
   List<School> _schools = [];
   List<Course> _courses = [];
@@ -39,7 +40,6 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _anoController.dispose();
     super.dispose();
   }
 
@@ -147,10 +147,10 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                       isSelected: _selectedCourse != null,
                     ),
                     const SizedBox(height: 20),
-                    AuthTextField(
-                      label: "Ano Escolar",
-                      hintText: "Ex: 2º Ano",
-                      controller: _anoController,
+                    AcademicYearDropdown(
+                      label: 'Ano Escolar',
+                      value: _selectedYear,
+                      onChanged: (y) => setState(() => _selectedYear = y),
                     ),
                   ],
                 ),
@@ -227,7 +227,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
               _selectedDate == null ||
               _selectedSchool == null ||
               _selectedCourse == null ||
-              _anoController.text.trim().isEmpty) {
+              _selectedYear == null) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Preenche todos os campos obrigatórios.')));
             return;
@@ -240,7 +240,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                 birthDate: _selectedDate!,
                 school: _selectedSchool!.name,
                 course: _selectedCourse!.name,
-                academicYear: _anoController.text.trim(),
+                academicYear: _selectedYear!,
                 phoneNumber: '+351${_phoneController.text.trim()}',
               ),
             ),

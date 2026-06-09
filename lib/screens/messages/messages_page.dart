@@ -186,7 +186,7 @@ class MessagesPage extends StatelessWidget {
                                   foregroundColor: Colors.black,
                                   elevation: 0,
                                 ),
-                                body: ProfilePage(profile: p),
+                                body: ProfilePage(profile: p, readOnly: true),
                               ),
                             ),
                           );

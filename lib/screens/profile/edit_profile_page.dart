@@ -29,7 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _bioController = TextEditingController();
   final _photoUrlController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _academicYearController = TextEditingController();
+  String? _selectedYear;
   final _tagOfertaController = TextEditingController();
   final _tagProcuraController = TextEditingController();
 
@@ -50,7 +50,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final p = widget.profile;
     _bioController.text = p.bio;
     _photoUrlController.text = p.photoUrl;
-    _academicYearController.text = p.academicYear;
+    _selectedYear = AcademicYearDropdown.years.contains(p.academicYear) ? p.academicYear : null;
     _tagsOferta = List.from(p.tagsOferta);
     _tagsProcura = List.from(p.tagsProcura);
 
@@ -66,7 +66,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _bioController.dispose();
     _photoUrlController.dispose();
     _phoneController.dispose();
-    _academicYearController.dispose();
     _tagOfertaController.dispose();
     _tagProcuraController.dispose();
     super.dispose();
@@ -115,7 +114,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         phoneNumber: '+351${_phoneController.text.trim()}',
         school: _selectedSchool?.name ?? widget.profile.school,
         course: _selectedCourse?.name ?? widget.profile.course,
-        academicYear: _academicYearController.text.trim(),
+        academicYear: _selectedYear ?? widget.profile.academicYear,
         tagsOferta: _tagsOferta,
         tagsProcura: _tagsProcura,
       );
@@ -276,10 +275,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             initialValue: widget.profile.course,
           ),
           const SizedBox(height: 16),
-          LabeledTextField(
+          AcademicYearDropdown(
             label: 'Ano',
-            controller: _academicYearController,
-            hint: 'Ex: 2º Ano',
+            value: _selectedYear,
+            onChanged: (y) => setState(() => _selectedYear = y),
           ),
         ],
       ),

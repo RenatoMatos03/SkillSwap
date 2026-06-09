@@ -144,6 +144,7 @@ class _AppDataPageState extends State<AppDataPage> {
                         tagsProcura: _tagsProcura,
                         tagsOferta: _tagsOferta,
                         phoneNumber: widget.phoneNumber,
+                        coins: 20,
                       );
                       await _userService.saveUserProfile(profile);
                       if (!mounted) return;
