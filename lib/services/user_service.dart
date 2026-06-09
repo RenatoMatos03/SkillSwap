@@ -35,6 +35,7 @@ class UserService {
     String? academicYear,
     List<String>? tagsOferta,
     List<String>? tagsProcura,
+    bool? showCoinsInProfile,
   }) async {
     final data = <String, dynamic>{};
     if (bio != null) data['bio'] = bio;
@@ -45,7 +46,12 @@ class UserService {
     if (academicYear != null) data['academicYear'] = academicYear;
     if (tagsOferta != null) data['tagsOferta'] = tagsOferta;
     if (tagsProcura != null) data['tagsProcura'] = tagsProcura;
+    if (showCoinsInProfile != null) data['showCoinsInProfile'] = showCoinsInProfile;
     if (data.isEmpty) return;
     await _db.collection('users').doc(uid).update(data);
+  }
+
+  Future<void> deleteUserData(String uid) async {
+    await _db.collection('users').doc(uid).delete();
   }
 }

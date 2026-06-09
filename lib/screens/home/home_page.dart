@@ -4,6 +4,7 @@ import '../../services/user_service.dart';
 import '../../theme/app_tokens.dart';
 import '../quiz/quiz_home_view.dart';
 import 'about_us_page.dart';
+import 'settings_page.dart';
 import 'home_mock_data.dart';
 import 'home_models.dart';
 import '../forum/forum_schools_page.dart';
@@ -326,11 +327,19 @@ class _HomePageState extends State<HomePage> {
           DrawerMenuItem(
             icon: Icons.settings_outlined,
             title: "Definições",
-            onTap: () => _showInfoSheet(
-              title: 'Definições',
-              message:
-                  'As definições ainda estão em construção, mas o item já é clicável.',
-            ),
+            onTap: () {
+              if (_profile == null) return;
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SettingsPage(
+                    profile: _profile!,
+                    onSettingsChanged: _loadProfile,
+                  ),
+                ),
+              );
+            },
           ),
           _buildLightDivider(),
           DrawerMenuItem(

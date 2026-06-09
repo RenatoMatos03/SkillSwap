@@ -17,3 +17,5 @@ export 'student_card.dart';
 export 'searchable_dropdown.dart';
 export 'phone_input_field.dart';
 export 'labeled_text_field.dart';
+export 'settings_group.dart';
+export 'settings_tile.dart';
