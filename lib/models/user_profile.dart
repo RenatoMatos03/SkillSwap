@@ -18,6 +18,7 @@ class UserProfile {
   final String phoneNumber;
   final String photoUrl;
   final double rating;
+  final bool showCoinsInProfile;
 
   UserProfile({
     required this.uid,
@@ -37,6 +38,7 @@ class UserProfile {
     this.phoneNumber = '',
     this.photoUrl = '',
     this.rating = 0.0,
+    this.showCoinsInProfile = true,
   });
 
   factory UserProfile.fromMap(String uid, Map<String, dynamic> map) {
@@ -58,6 +60,7 @@ class UserProfile {
       phoneNumber: map['phoneNumber'] ?? '',
       photoUrl: map['photoUrl'] ?? '',
       rating: (map['rating'] ?? 0).toDouble(),
+      showCoinsInProfile: map['showCoinsInProfile'] ?? true,
     );
   }
 
@@ -79,6 +82,7 @@ class UserProfile {
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'rating': rating,
+      'showCoinsInProfile': showCoinsInProfile,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }

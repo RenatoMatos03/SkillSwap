@@ -91,12 +91,14 @@ class ProfilePage extends StatelessWidget {
                 iconColor: Colors.orange,
                 label: '${profile.streak} semana${profile.streak == 1 ? '' : 's'}',
               ),
-              const SizedBox(width: 8),
-              ProfileStatChip(
-                icon: Icons.copyright,
-                iconColor: Colors.white,
-                label: '${profile.coins} moedas',
-              ),
+              if (profile.showCoinsInProfile) ...[
+                const SizedBox(width: 8),
+                ProfileStatChip(
+                  icon: Icons.copyright,
+                  iconColor: Colors.white,
+                  label: '${profile.coins} moedas',
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
