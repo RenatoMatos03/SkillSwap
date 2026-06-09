@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/school.dart';
-import '../../models/forum/course.dart'; // <--- NOVO IMPORT
-import '../../services/forum_service.dart'; // <--- NOVO IMPORT
+import '../../models/forum/course.dart'; 
+import '../../services/forum_service.dart'; 
 
 class SchoolCard extends StatefulWidget {
   final School school;
@@ -30,11 +30,13 @@ class _SchoolCardState extends State<SchoolCard> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            // AQUI ESTÁ O AJUSTE: Sombra mais pronunciada
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(_isHovered ? 0.08 : 0.03),
-                blurRadius: _isHovered ? 15 : 10,
-                offset: _isHovered ? const Offset(0, 5) : const Offset(0, 2),
+                color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.06),
+                blurRadius: _isHovered ? 20 : 10,
+                spreadRadius: _isHovered ? 2 : 0,
+                offset: _isHovered ? const Offset(0, 8) : const Offset(0, 3),
               )
             ],
           ),
@@ -60,7 +62,6 @@ class _SchoolCardState extends State<SchoolCard> {
               StreamBuilder<List<Course>>(
                 stream: ForumService().getCoursesStream(widget.school.acronym),
                 builder: (context, snapshot) {
-                  // Conta quantos cursos chegaram do Firebase
                   int count = snapshot.hasData ? snapshot.data!.length : 0;
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

@@ -38,10 +38,10 @@ class _CourseCardState extends State<CourseCard> {
           borderRadius: borderRadius,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(_isHovered ? 0.08 : 0.03), 
-              blurRadius: _isHovered ? 15 : 10,
-              spreadRadius: _isHovered ? 1 : 0,
-              offset: _isHovered ? const Offset(0, 5) : const Offset(0, 2),
+              color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.06),
+              blurRadius: _isHovered ? 20 : 10,
+              spreadRadius: _isHovered ? 2 : 0,
+              offset: _isHovered ? const Offset(0, 8) : const Offset(0, 3),
             )
           ],
         ),

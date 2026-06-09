@@ -72,21 +72,20 @@ class _SwipePageState extends State<SwipePage> {
   }
 
   void _onPanEnd(DragEndDetails details) {
-    if (_profiles.isEmpty)
-      return; // Apenas bloqueia totalmente se não houver perfis desde o início
+    if (_profiles.isEmpty) return;
 
     const double velocityThreshold = 300.0;
     double dx = details.velocity.pixelsPerSecond.dx;
     double dy = details.velocity.pixelsPerSecond.dy;
 
-    // 🔥 SE ESTIVERMOS NO FIM DA LISTA: Só permitimos o swipe para a esquerda
+    // 🔥 SE ESTIVERMOS NO FIM DA LISTA: Só permitimos voltar atrás (agora para a DIREITA)
     if (_currentIndex >= _profiles.length) {
-      if (dx < -velocityThreshold && _currentIndex > 0) {
+      if (dx > velocityThreshold && _currentIndex > 0) {
         setState(() {
           _currentIndex--;
         });
       }
-      return; // Sai da função para não tentar fazer matches imaginários no fim da lista
+      return;
     }
 
     // 🔥 SE AINDA HOUVER CARTÕES, FAZ A LÓGICA NORMAL:
@@ -111,14 +110,14 @@ class _SwipePageState extends State<SwipePage> {
         });
       });
     }
-    // Swipe para a DIREITA -> SKIP (Avança perfil)
-    else if (dx > velocityThreshold) {
+    // Swipe para a ESQUERDA -> SKIP (Avança perfil)
+    else if (dx < -velocityThreshold) {
       setState(() {
         _currentIndex++;
       });
     }
-    // Swipe para a ESQUERDA -> VOLTAR ATRÁS
-    else if (dx < -velocityThreshold) {
+    // Swipe para a DIREITA -> VOLTAR ATRÁS
+    else if (dx > velocityThreshold) {
       if (_currentIndex > 0) {
         setState(() {
           _currentIndex--;
@@ -148,15 +147,14 @@ class _SwipePageState extends State<SwipePage> {
               behavior: HitTestBehavior
                   .opaque, // Importante para detetar o toque no ecrã vazio
               child: _profiles.isEmpty
-                  ? _buildNoProfilesMessage() // Mensagem quando não há matches no geral
+                  ? _buildNoProfilesMessage()
                   : _currentIndex >= _profiles.length
-                  ? _buildEndOfListMessage() // Mensagem do fim da lista (AGORA DÁ SWIPE!)
+                  ? _buildEndOfListMessage()
                   : StudentCard(profile: _profiles[_currentIndex]),
             ),
     );
   }
 
-  // Criei um ecrã ligeiramente diferente caso não haja de todo estudantes compatíveis desde o início
   Widget _buildNoProfilesMessage() {
     return const Center(
       child: Column(
@@ -188,7 +186,7 @@ class _SwipePageState extends State<SwipePage> {
           Text("Viste todos os estudantes compatíveis."),
           SizedBox(height: 24),
           Text(
-            "← Desliza para voltar atrás",
+            "Desliza para a direita para voltar atrás →",
             style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
           ),
         ],
