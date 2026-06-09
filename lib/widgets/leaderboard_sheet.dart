@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_tokens.dart';
 import '../utils/string_utils.dart';
 
+/// Bottom sheet com o top 5 de utilizadores para um determinado campo de pontuação.
 class LeaderboardSheet extends StatelessWidget {
   final String title;
   final String field;
@@ -17,6 +18,7 @@ class LeaderboardSheet extends StatelessWidget {
     required this.icon,
   });
 
+  /// Obtém os 5 utilizadores com maior valor no campo indicado.
   Future<List<Map<String, dynamic>>> _fetchTop5() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('users')

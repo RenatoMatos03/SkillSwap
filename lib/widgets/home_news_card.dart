@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/home/home_models.dart';
 import '../theme/app_tokens.dart';
 
+/// Cartão de notícia/dica exibido na secção de dicas da página inicial.
 class HomeNewsCard extends StatelessWidget {
   final NewsItem item;
   final VoidCallback onTap;

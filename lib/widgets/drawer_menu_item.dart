@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Item de menu do drawer lateral com ícone e título.
 class DrawerMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;

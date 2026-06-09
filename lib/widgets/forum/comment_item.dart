@@ -3,18 +3,19 @@ import 'package:flutter/material.dart';
 import '../../models/forum/comment_model.dart';
 import '../../services/forum_service.dart';
 import 'custom_badge.dart';
-import '../../utils/utils.dart'; // <--- O TEU NOVO IMPORT LIMPO
+import '../../utils/utils.dart';
 
+/// Item de comentário com suporte a votos, respostas aninhadas e marcação como solução.
 class CommentItem extends StatefulWidget {
   final String questionId;
-  final String rootCommentId; 
+  final String rootCommentId;
   final CommentModel comment;
-  final Map<String, List<CommentModel>>? groupedReplies; 
+  final Map<String, List<CommentModel>>? groupedReplies;
   final Function(String, CommentModel) onReply;
   final bool showAcceptButton;
   final VoidCallback onSolutionToggled;
   final bool isSubComment;
-  final int depth; 
+  final int depth;
 
   const CommentItem({
     super.key,
@@ -26,7 +27,7 @@ class CommentItem extends StatefulWidget {
     required this.showAcceptButton,
     required this.onSolutionToggled,
     this.isSubComment = false,
-    this.depth = 0, 
+    this.depth = 0,
   });
 
   @override
@@ -36,7 +37,7 @@ class CommentItem extends StatefulWidget {
 class _CommentItemState extends State<CommentItem> {
   bool _isExpanded = false;
   String _voteStatus = 'none';
-  
+
   late int _localVotes;
   bool _isVoting = false;
 
@@ -54,36 +55,37 @@ class _CommentItemState extends State<CommentItem> {
     }
   }
 
+  /// Processa o voto do utilizador (positivo ou negativo) com lógica de toggle.
   void _handleVote(bool isUp) async {
     int change = 0;
-    
+
     setState(() {
       if (isUp) {
         if (_voteStatus == 'up') {
-          _voteStatus = 'none'; 
+          _voteStatus = 'none';
           change = -1;
         } else if (_voteStatus == 'down') {
-          _voteStatus = 'up'; 
+          _voteStatus = 'up';
           change = 2;
         } else {
-          _voteStatus = 'up'; 
+          _voteStatus = 'up';
           change = 1;
         }
       } else {
         if (_voteStatus == 'down') {
-          _voteStatus = 'none'; 
+          _voteStatus = 'none';
           change = 1;
         } else if (_voteStatus == 'up') {
-          _voteStatus = 'down'; 
+          _voteStatus = 'down';
           change = -2;
         } else {
-          _voteStatus = 'down'; 
+          _voteStatus = 'down';
           change = -1;
         }
       }
-      
+
       _localVotes += change;
-      _isVoting = true; 
+      _isVoting = true;
     });
 
     if (change != 0) {
@@ -106,17 +108,16 @@ class _CommentItemState extends State<CommentItem> {
   @override
   Widget build(BuildContext context) {
     const Color brandColor = Color(0xFF009191);
-    
+
     bool isUpvoted = _voteStatus == 'up';
     bool isDownvoted = _voteStatus == 'down';
 
     Color upIconColor = isUpvoted ? brandColor : Colors.grey[500]!;
-    Color downIconColor = isDownvoted ? Colors.grey[800]! : Colors.grey[500]!; 
+    Color downIconColor = isDownvoted ? Colors.grey[800]! : Colors.grey[500]!;
     Color voteTextColor = isUpvoted ? brandColor : (isDownvoted ? Colors.grey[800]! : const Color(0xFF1D204B));
     Color voteBorderColor = isUpvoted ? brandColor : (isDownvoted ? Colors.grey[800]! : Colors.grey[300]!);
     Color voteBgColor = isUpvoted ? brandColor.withValues(alpha: 0.1) : (isDownvoted ? Colors.grey[200]! : Colors.transparent);
 
-    // CHAMA A FUNÇÃO GLOBAL AQUI
     String acronym = getCourseAcronym(widget.comment.badge);
 
     Map<String, List<CommentModel>> map = widget.groupedReplies ?? {};
@@ -135,11 +136,11 @@ class _CommentItemState extends State<CommentItem> {
     List<CommentModel> myChildren = map[widget.comment.id] ?? [];
 
     double screenWidth = MediaQuery.of(context).size.width;
-    double margins = 76.0; 
-    double currentIndent = widget.depth * 14.0; 
-    double idealWidth = screenWidth - margins - currentIndent; 
-    
-    double contentWidth = max(idealWidth, 270.0); 
+    double margins = 76.0;
+    double currentIndent = widget.depth * 14.0;
+    double idealWidth = screenWidth - margins - currentIndent;
+
+    double contentWidth = max(idealWidth, 270.0);
 
     Widget content = SizedBox(
       width: contentWidth,
@@ -150,8 +151,8 @@ class _CommentItemState extends State<CommentItem> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 14, 
-                backgroundColor: brandColor, 
+                radius: 14,
+                backgroundColor: brandColor,
                 child: Text(widget.comment.userInitials, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))
               ),
               const SizedBox(width: 8),
@@ -170,18 +171,18 @@ class _CommentItemState extends State<CommentItem> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
           Text(widget.comment.text, textAlign: TextAlign.justify, style: const TextStyle(fontSize: 13, color: Color(0xFF4F4F4F), height: 1.5)),
           const SizedBox(height: 16),
-          
+
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: voteBgColor,
-                  border: Border.all(color: voteBorderColor), 
+                  border: Border.all(color: voteBorderColor),
                   borderRadius: BorderRadius.circular(20)
                 ),
                 child: Row(children: [
@@ -193,31 +194,31 @@ class _CommentItemState extends State<CommentItem> {
                 ]),
               ),
               const SizedBox(width: 16),
-              
+
               GestureDetector(
-                onTap: () => widget.onReply(widget.rootCommentId, widget.comment), 
+                onTap: () => widget.onReply(widget.rootCommentId, widget.comment),
                 child: const Row(children: [Icon(Icons.reply, size: 16, color: Colors.grey), SizedBox(width: 4), Text("Responder", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12))]),
               ),
-              
+
               if (myChildren.isNotEmpty) ...[
                 const SizedBox(width: 16),
                 GestureDetector(
                   onTap: () => setState(() => _isExpanded = !_isExpanded),
                   child: Row(children: [
-                    Icon(_isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 16, color: brandColor), 
-                    const SizedBox(width: 4), 
+                    Icon(_isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 16, color: brandColor),
+                    const SizedBox(width: 4),
                     Text(_isExpanded ? "Ocultar" : "Ver ${myChildren.length} res.", style: const TextStyle(color: brandColor, fontWeight: FontWeight.bold, fontSize: 12))
                   ]),
                 ),
               ],
 
               const Spacer(),
-              
+
               if (widget.comment.isSolution)
                 const Row(children: [Icon(Icons.check, size: 16, color: Color(0xFF00E676)), SizedBox(width: 4), Text("Solução", style: TextStyle(color: Color(0xFF00E676), fontWeight: FontWeight.bold, fontSize: 12))])
               else if (widget.showAcceptButton && !widget.isSubComment)
                 TextButton(
-                  onPressed: widget.onSolutionToggled, 
+                  onPressed: widget.onSolutionToggled,
                   style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 0), tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                   child: const Text("✔ Aceitar", style: TextStyle(color: brandColor, fontWeight: FontWeight.bold, fontSize: 12)),
                 )
@@ -230,9 +231,9 @@ class _CommentItemState extends State<CommentItem> {
     if (widget.isSubComment) {
       return Container(
         margin: const EdgeInsets.only(top: 12),
-        padding: const EdgeInsets.only(left: 12), 
+        padding: const EdgeInsets.only(left: 12),
         decoration: BoxDecoration(
-          border: Border(left: BorderSide(color: Colors.grey[300]!, width: 2)) 
+          border: Border(left: BorderSide(color: Colors.grey[300]!, width: 2))
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,16 +243,16 @@ class _CommentItemState extends State<CommentItem> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: myChildren.map((c) => CommentItem(
-                  key: ValueKey(c.id), 
+                  key: ValueKey(c.id),
                   questionId: widget.questionId,
                   rootCommentId: widget.rootCommentId,
-                  groupedReplies: map, 
+                  groupedReplies: map,
                   comment: c,
                   onReply: widget.onReply,
                   showAcceptButton: false,
                   onSolutionToggled: () {},
                   isSubComment: true,
-                  depth: widget.depth + 1, 
+                  depth: widget.depth + 1,
                 )).toList(),
               ),
           ],
@@ -282,16 +283,16 @@ class _CommentItemState extends State<CommentItem> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: myChildren.map((c) => CommentItem(
-                        key: ValueKey(c.id), 
+                        key: ValueKey(c.id),
                         questionId: widget.questionId,
                         rootCommentId: widget.rootCommentId,
-                        groupedReplies: map, 
+                        groupedReplies: map,
                         comment: c,
                         onReply: widget.onReply,
                         showAcceptButton: false,
                         onSolutionToggled: () {},
                         isSubComment: true,
-                        depth: widget.depth + 1, 
+                        depth: widget.depth + 1,
                       )).toList(),
                     ),
                   ),

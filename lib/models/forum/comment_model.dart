@@ -1,14 +1,15 @@
+/// Modelo de comentário ou resposta do fórum com suporte a votos e soluções.
 class CommentModel {
   String? id;
-  String? parentCommentId; // NOVO: Para identificar a quem pertence o subcomentário
+  String? parentCommentId;
   final String userId;
   final String userName;
   final String userInitials;
   final String badge;
-  final DateTime createdAt; 
-  String text; // Deixou de ser final para podermos adicionar @ menções
-  int votes; 
-  bool isSolution; 
+  final DateTime createdAt;
+  String text;
+  int votes;
+  bool isSolution;
   final List<CommentModel> replies;
 
   CommentModel({
@@ -25,6 +26,7 @@ class CommentModel {
     List<CommentModel>? replies,
   }) : replies = replies ?? [];
 
+  /// Devolve o tempo decorrido desde a criação do comentário de forma legível.
   String get timeAgo {
     final diff = DateTime.now().difference(createdAt);
     if (diff.inDays > 0) return '${diff.inDays}d';
@@ -33,10 +35,11 @@ class CommentModel {
     return 'agora';
   }
 
+  /// Converte o comentário para um mapa compatível com o Firestore.
   Map<String, dynamic> toMap() {
     return {
-      'id': id, // Guarda o ID gerado no array
-      'parentCommentId': parentCommentId, // Guarda o pai
+      'id': id,
+      'parentCommentId': parentCommentId,
       'userId': userId,
       'userName': userName,
       'userInitials': userInitials,
@@ -49,9 +52,10 @@ class CommentModel {
     };
   }
 
+  /// Constrói um [CommentModel] a partir de um mapa Firestore.
   factory CommentModel.fromMap(Map<String, dynamic> map, String docId) {
     return CommentModel(
-      id: map['id'] ?? docId, // Aproveita o ID do map se existir (útil para os arrays)
+      id: map['id'] ?? docId,
       parentCommentId: map['parentCommentId'],
       userId: map['userId'] ?? '',
       userName: map['userName'] ?? '',
@@ -61,7 +65,7 @@ class CommentModel {
       text: map['text'] ?? '',
       votes: map['votes'] ?? 0,
       isSolution: map['isSolution'] ?? false,
-      replies: map['replies'] != null 
+      replies: map['replies'] != null
           ? List<CommentModel>.from((map['replies'] as List).map((x) => CommentModel.fromMap(x, x['id'] ?? '')))
           : [],
     );

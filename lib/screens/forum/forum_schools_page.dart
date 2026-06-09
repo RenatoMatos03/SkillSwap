@@ -4,6 +4,7 @@ import '../../services/forum_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import 'forum_courses_page.dart';
 
+/// Ecrã de listagem das escolas do IPS no fórum em grelha.
 class ForumSchoolsPage extends StatelessWidget {
   const ForumSchoolsPage({super.key});
 
@@ -24,10 +25,10 @@ class ForumSchoolsPage extends StatelessWidget {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(color: Color(0xFF009191)));
                   }
-                  
+
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
-                      child: Text("Nenhuma escola encontrada.\nAdiciona-as no Firebase!", 
+                      child: Text("Nenhuma escola encontrada.\nAdiciona-as no Firebase!",
                       textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
                     );
                   }

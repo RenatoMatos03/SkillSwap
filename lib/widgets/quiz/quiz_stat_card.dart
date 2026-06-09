@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Cartão de estatística resumida para o ecrã inicial do quiz.
 class QuizStatCard extends StatelessWidget {
   final IconData icon;
   final String value;

@@ -6,6 +6,7 @@ import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import '../auth/login_page.dart';
 
+/// Ecrã de definições da aplicação com opções de conta e preferências.
 class SettingsPage extends StatefulWidget {
   final UserProfile profile;
   final VoidCallback onSettingsChanged;
@@ -50,6 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
     widget.onSettingsChanged();
   }
 
+  /// Envia um email de redefinição de password para o email do perfil.
   Future<void> _sendPasswordReset() async {
     try {
       await FirebaseAuth.instance
@@ -66,6 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  /// Pede confirmação e termina a sessão do utilizador.
   Future<void> _logout() async {
     final confirm = await _confirm(
       title: 'Terminar Sessão',
@@ -83,6 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// Pede confirmação e elimina permanentemente a conta e os dados do utilizador.
   Future<void> _deleteAccount() async {
     final confirm = await _confirm(
       title: 'Apagar Conta',
@@ -111,6 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  /// Mostra um diálogo de confirmação genérico e devolve a resposta do utilizador.
   Future<bool> _confirm({
     required String title,
     required String message,

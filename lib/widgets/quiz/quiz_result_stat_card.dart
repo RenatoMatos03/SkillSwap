@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Cartão de estatística resumida para o ecrã de resultado do quiz.
 class QuizResultStatCard extends StatelessWidget {
   final String value;
   final String label;

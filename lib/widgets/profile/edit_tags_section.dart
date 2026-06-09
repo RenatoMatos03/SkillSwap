@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../custom_tag_input.dart';
 import 'profile_section_card.dart';
 
+/// Secção de edição de tags com campo de entrada e lista de chips removíveis.
 class EditTagsSection extends StatelessWidget {
   final String title;
   final String subtitle;

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const _kFieldColor = Color(0xFFF2F5F7);
 const _kPrimary = Color(0xFF009191);
 
+/// Dropdown com pesquisa por texto sobre uma lista de opções tipadas.
 class SearchableDropdown<T extends Object> extends StatelessWidget {
   final String label;
   final List<T> options;

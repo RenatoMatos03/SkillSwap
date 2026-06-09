@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Modelo de perfil do utilizador com todos os dados académicos e de gamificação.
 class UserProfile {
   final String uid;
   final String email;
@@ -47,6 +48,7 @@ class UserProfile {
     this.matches = const [],
   });
 
+  /// Constrói um [UserProfile] a partir de um mapa Firestore.
   factory UserProfile.fromMap(String uid, Map<String, dynamic> map) {
     return UserProfile(
       uid: uid,
@@ -75,6 +77,7 @@ class UserProfile {
     );
   }
 
+  /// Converte o perfil para um mapa compatível com o Firestore.
   Map<String, dynamic> toMap() {
     return {
       'email': email,

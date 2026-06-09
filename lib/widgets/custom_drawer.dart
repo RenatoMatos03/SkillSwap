@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'drawer_menu_item.dart';
-import '../screens/home/about_us_page.dart'; // O import da página dos teus colegas
+import '../screens/home/about_us_page.dart';
 
+/// Drawer lateral de navegação principal da aplicação.
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
@@ -37,11 +38,10 @@ class CustomDrawer extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Botão "X" para fechar o menu
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.grey),
                     onPressed: () {
-                      Navigator.pop(context); // Fecha o Drawer
+                      Navigator.pop(context);
                     },
                   ),
                 ],
@@ -49,12 +49,10 @@ class CustomDrawer extends StatelessWidget {
             ),
             const Divider(),
 
-            // Os novos botões com fundo verde
             DrawerMenuItem(
               icon: Icons.person_outline,
               title: 'Ver Perfil',
               onTap: () {
-                // Navegação a implementar mais tarde
               },
             ),
             DrawerMenuItem(
@@ -71,10 +69,8 @@ class CustomDrawer extends StatelessWidget {
               icon: Icons.info_outline,
               title: 'About Us',
               onTap: () {
-                // 1. Primeiro fecha o Drawer
                 Navigator.pop(context);
 
-                // 2. Depois navega para a página About Us
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const AboutUsPage()),

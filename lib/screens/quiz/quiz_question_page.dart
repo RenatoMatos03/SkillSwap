@@ -4,6 +4,7 @@ import '../../models/quiz_models.dart';
 import 'quiz_result_page.dart';
 import '../../widgets/quiz/quiz_widgets.dart';
 
+/// Ecrã de resposta às perguntas do quiz com navegação sequencial.
 class QuizQuestionPage extends StatefulWidget {
   final List<QuizQuestion> questions;
 
@@ -21,6 +22,7 @@ class _QuizQuestionPageState extends State<QuizQuestionPage> {
 
   QuizQuestion get _currentQuestion => widget.questions[_currentIndex];
 
+  /// Confirma a resposta ou avança para a próxima pergunta, navegando para o resultado no final.
   void _handlePrimaryAction() {
     if (!_answered) {
       if (_selectedOptionIndex == null) return;

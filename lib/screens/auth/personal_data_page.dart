@@ -5,6 +5,7 @@ import '../../services/forum_service.dart';
 import '../../widgets/widgets.dart';
 import 'app_data_page.dart';
 
+/// Ecrã do passo 1 do registo para recolha de dados pessoais e académicos.
 class PersonalDataPage extends StatefulWidget {
   const PersonalDataPage({super.key});
 
@@ -48,6 +49,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
     if (mounted) setState(() { _schools = schools; _loadingSchools = false; });
   }
 
+  /// Carrega os cursos da escola selecionada e reinicia o curso escolhido.
   Future<void> _onSchoolSelected(School school) async {
     setState(() {
       _selectedSchool = school;

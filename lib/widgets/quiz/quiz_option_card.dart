@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/quiz_models.dart';
 
+/// Cartão de opção de resposta do quiz com estados visuais de seleção e correção.
 class QuizOptionCard extends StatelessWidget {
   final QuizOption option;
   final bool isSelected;

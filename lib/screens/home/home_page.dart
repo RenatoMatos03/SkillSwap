@@ -15,6 +15,7 @@ import '../../utils/string_utils.dart';
 import '../../widgets/profile/profile_widgets.dart';
 import '../../widgets/widgets.dart';
 
+/// Ecrã principal com navegação por abas, drawer e conteúdo da página inicial.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -42,6 +43,7 @@ class _HomePageState extends State<HomePage> {
     _loadProfile();
   }
 
+  /// Carrega o perfil do utilizador autenticado e verifica notificações de quiz.
   Future<void> _loadProfile() async {
     final profile = await _userService.getUserProfile();
     if (mounted) setState(() => _profile = profile);
@@ -103,7 +105,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 _buildHomeContent(),
                 const SwipePage(),
-                const MessagesPage(), // 🔥 AQUI ESTÁ A TUA PÁGINA
+                const MessagesPage(),
                 Navigator(
                   key: _forumNavigatorKey,
                   onGenerateRoute: (settings) {
@@ -369,6 +371,7 @@ class _HomePageState extends State<HomePage> {
     _showInfoSheet(title: item.title, message: item.subtitle);
   }
 
+  /// Abre o bottom sheet do leaderboard para o item selecionado.
   void _showLeaderboardDetails(LeaderboardItem item) {
     showModalBottomSheet(
       context: context,

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/user_service.dart';
 import '../theme/app_tokens.dart';
 
+/// Ícone de sino com badge de notificações não lidas.
 class NotificationBell extends StatefulWidget {
   const NotificationBell({super.key});
 
@@ -73,6 +74,7 @@ class _NotificationBellState extends State<NotificationBell> {
     );
   }
 
+  /// Abre o painel de notificações num bottom sheet.
   void _openNotifications(BuildContext context) {
     showModalBottomSheet(
       context: context,

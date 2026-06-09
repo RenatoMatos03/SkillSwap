@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Badge colorido com texto e ícone opcional para uso no fórum.
 class CustomBadge extends StatelessWidget {
   final String text;
   final Color textColor;

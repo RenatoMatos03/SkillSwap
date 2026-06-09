@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_profile.dart';
 
+/// Serviço de gestão de perfis de utilizador, moedas e notificações no Firestore.
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  /// Verifica se o utilizador atual já tem perfil criado no Firestore.
   Future<bool> profileExists() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return false;
@@ -13,10 +15,12 @@ class UserService {
     return doc.exists;
   }
 
+  /// Guarda ou substitui o perfil do utilizador no Firestore.
   Future<void> saveUserProfile(UserProfile profile) async {
     await _db.collection('users').doc(profile.uid).set(profile.toMap());
   }
 
+  /// Obtém o perfil do utilizador autenticado atualmente.
   Future<UserProfile?> getUserProfile() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
@@ -25,6 +29,7 @@ class UserService {
     return UserProfile.fromMap(uid, doc.data()!);
   }
 
+  /// Atualiza apenas os campos fornecidos no perfil do utilizador.
   Future<void> updateProfile({
     required String uid,
     String? bio,
@@ -59,6 +64,7 @@ class UserService {
     await _db.collection('users').doc(uid).delete();
   }
 
+  /// Regista a conclusão do quiz e adiciona as moedas ganhas ao utilizador.
   Future<void> markQuizCompleted({
     required String uid,
     required int score,
@@ -74,12 +80,14 @@ class UserService {
     });
   }
 
+  /// Devolve a chave da semana atual no formato YYYY-MM-DD da segunda-feira.
   static String currentWeekKey() {
     final now = DateTime.now();
     final monday = now.subtract(Duration(days: now.weekday - 1));
     return '${monday.year}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
   }
 
+  /// Transfere moedas do remetente para o destinatário e atualiza a avaliação num único batching transacional.
   Future<void> transferCoins({
     required String senderUid,
     required String receiverUid,
@@ -130,6 +138,7 @@ class UserService {
     });
   }
 
+  /// Envia uma notificação de quiz disponível se o utilizador não jogou ainda nesta semana.
   Future<void> maybeNotifyQuizAvailable(String uid) async {
     final doc = await _db.collection('users').doc(uid).get();
     if (!doc.exists) return;
@@ -138,10 +147,8 @@ class UserService {
     final lastQuizWeek = data['lastQuizWeek'] as String?;
     final currentWeek = currentWeekKey();
 
-    // Only notify if the user has done a quiz before AND a new week started
     if (lastQuizWeek == null || lastQuizWeek == currentWeek) return;
 
-    // Avoid duplicate notification for the same week
     final lastNotifiedWeek = data['lastQuizNotifiedWeek'] as String?;
     if (lastNotifiedWeek == currentWeek) return;
 
@@ -155,6 +162,7 @@ class UserService {
     });
   }
 
+  /// Marca todas as notificações não lidas do utilizador como lidas.
   Future<void> markNotificationsRead(String uid) async {
     final unread = await _db
         .collection('users')

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Campo de texto com botão para adicionar tags.
 class CustomTagInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -57,6 +58,7 @@ class CustomTagInputField extends StatelessWidget {
   }
 }
 
+/// Chip de tag com botão de remoção.
 class CustomTagChip extends StatelessWidget {
   final String label;
   final VoidCallback onRemove;

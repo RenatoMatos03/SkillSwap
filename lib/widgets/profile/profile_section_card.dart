@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_tokens.dart';
 
+/// Cartão de secção do perfil com título e subtítulo opcionais.
 class ProfileSectionCard extends StatelessWidget {
   final String title;
   final String? subtitle;

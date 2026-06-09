@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 const _kFieldColor = Color(0xFFF2F5F7);
 
+/// Campo de texto para número de telemóvel com prefixo de indicativo.
 class PhoneInputField extends StatelessWidget {
   final TextEditingController controller;
   final String prefix;

@@ -3,6 +3,7 @@ import '../../services/auth_service.dart';
 import '../../widgets/widgets.dart';
 import 'verify_email_page.dart';
 
+/// Ecrã de registo de novo utilizador com validação de password.
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -29,6 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  /// Valida as passwords e regista o utilizador, enviando o email de verificação.
   Future<void> _register() async {
     if (_passwordController.text != _confirmPasswordController.text) {
       setState(() => _errorMessage = 'As passwords não coincidem.');

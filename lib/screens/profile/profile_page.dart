@@ -4,6 +4,7 @@ import '../../theme/app_tokens.dart';
 import '../../widgets/profile/profile_widgets.dart';
 import 'edit_profile_page.dart';
 
+/// Ecrã de perfil do utilizador com separadores de informação e estatísticas.
 class ProfilePage extends StatelessWidget {
   final UserProfile profile;
   final VoidCallback? onProfileUpdated;
@@ -119,6 +120,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  /// Constrói a avaliação em estrelas com base na classificação média.
   Widget _buildStarRating(double rating) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

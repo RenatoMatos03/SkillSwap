@@ -1,4 +1,3 @@
-// Exporta todos os widgets gerais da aplicação
 export 'about_us_content_card.dart';
 export 'app_header_actions.dart';
 export 'auth_button.dart';

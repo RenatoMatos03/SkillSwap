@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_tokens.dart';
 
+/// Campo de texto com label opcional e estilo consistente com o tema da aplicação.
 class LabeledTextField extends StatelessWidget {
   final String? label;
   final TextEditingController controller;

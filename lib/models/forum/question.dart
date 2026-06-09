@@ -1,14 +1,15 @@
+/// Modelo de uma pergunta do fórum.
 class Question {
-  String? id; 
-  final String userId; // <--- NOVO
-  final String subjectName; 
+  String? id;
+  final String userId;
+  final String subjectName;
   final String title;
   final String description;
-  final String status; 
+  final String status;
   final String userName;
   final String userInitials;
   final int commentsCount;
-  final DateTime createdAt; 
+  final DateTime createdAt;
   final List<String> tags;
   final String userCourse;
 
@@ -27,6 +28,7 @@ class Question {
     required this.userCourse,
   });
 
+  /// Devolve o tempo decorrido desde a criação da pergunta de forma legível.
   String get timeAgo {
     final diff = DateTime.now().difference(createdAt);
     if (diff.inDays > 0) return '${diff.inDays}d';
@@ -35,6 +37,7 @@ class Question {
     return 'agora';
   }
 
+  /// Converte a pergunta para um mapa compatível com o Firestore.
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
@@ -51,6 +54,7 @@ class Question {
     };
   }
 
+  /// Constrói uma [Question] a partir de um mapa Firestore.
   factory Question.fromMap(Map<String, dynamic> map, String docId) {
     return Question(
       id: docId,

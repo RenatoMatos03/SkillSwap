@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 const _kFieldColor = Color(0xFFF2F5F7);
 
+/// Dropdown para selecção do ano académico.
 class AcademicYearDropdown extends StatelessWidget {
   final String? value;
   final void Function(String?) onChanged;

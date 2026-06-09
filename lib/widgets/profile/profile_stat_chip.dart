@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Chip de estatística compacto para o cabeçalho do perfil.
 class ProfileStatChip extends StatelessWidget {
   final IconData icon;
   final Color iconColor;

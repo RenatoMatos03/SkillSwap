@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/user_profile.dart';
 
+/// Cartão de perfil de estudante exibido no ecrã de swipe.
 class StudentCard extends StatelessWidget {
   final UserProfile profile;
 
@@ -18,7 +19,6 @@ class StudentCard extends StatelessWidget {
 
     return Stack(
       children: [
-        // Imagem de Fundo
         Positioned.fill(
           child: profile.photoUrl.isNotEmpty
               ? Image.network(
@@ -29,7 +29,6 @@ class StudentCard extends StatelessWidget {
               : _buildNoImage(),
         ),
 
-        // Gradiente Escuro
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
@@ -47,7 +46,6 @@ class StudentCard extends StatelessWidget {
           ),
         ),
 
-        // Informação do Aluno
         Positioned(
           bottom: 24,
           left: 24,
@@ -69,7 +67,7 @@ class StudentCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
-                          profile.rating.toStringAsFixed(1), // Ex: 4.0
+                          profile.rating.toStringAsFixed(1),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,

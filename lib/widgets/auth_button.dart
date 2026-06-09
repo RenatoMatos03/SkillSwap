@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Botão principal de ação para ecrãs de autenticação.
 class AuthButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;

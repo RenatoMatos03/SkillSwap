@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_tokens.dart';
 
+/// Cartão com o conteúdo da página "Sobre Nós".
 class AboutUsContentCard extends StatelessWidget {
   const AboutUsContentCard({super.key});
 

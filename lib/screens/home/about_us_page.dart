@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/about_us_content_card.dart';
 
+/// Ecrã de informação sobre a equipa e o projeto SkillSwap.
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
 

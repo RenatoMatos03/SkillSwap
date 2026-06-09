@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+/// Modelo de curso académico do fórum.
 class Course {
   String? id;
-  final String schoolAcronym; 
+  final String schoolAcronym;
   final String acronym;
   final String name;
-  final String type; 
+  final String type;
   final int questionsCount;
   final String area;
   final Color color;
@@ -21,6 +22,7 @@ class Course {
     required this.color,
   });
 
+  /// Converte o curso para um mapa compatível com o Firestore.
   Map<String, dynamic> toMap() {
     return {
       'schoolAcronym': schoolAcronym,
@@ -29,10 +31,11 @@ class Course {
       'type': type,
       'questionsCount': questionsCount,
       'area': area,
-      'colorValue': color.toARGB32(), // Corrigido aqui
+      'colorValue': color.toARGB32(),
     };
   }
 
+  /// Constrói um [Course] a partir de um mapa Firestore.
   factory Course.fromMap(Map<String, dynamic> map, String docId) {
     return Course(
       id: docId,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Cabeçalho de página do fórum com botão de retroceder e título.
 class ForumPageHeader extends StatelessWidget {
   final String title;
 
@@ -16,7 +17,7 @@ class ForumPageHeader extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.grey[100], 
+                color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(12)
               ),
               child: const Icon(Icons.arrow_back, size: 20, color: Color(0xFF1D204B)),
@@ -25,7 +26,7 @@ class ForumPageHeader extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              title, 
+              title,
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1D204B)),
               overflow: TextOverflow.ellipsis,
             ),

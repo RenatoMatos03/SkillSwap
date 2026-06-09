@@ -8,6 +8,7 @@ import 'verify_email_page.dart';
 import 'personal_data_page.dart';
 import '../home/home_page.dart';
 
+/// Ecrã de início de sessão com redirecionamento consoante o estado do perfil.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -32,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  /// Autentica o utilizador e redireciona para o ecrã adequado.
   Future<void> _login() async {
     setState(() {
       _isLoading = true;

@@ -1,3 +1,4 @@
+/// Opção de resposta de uma pergunta do quiz.
 class QuizOption {
   final String letter;
   final String text;
@@ -10,6 +11,7 @@ class QuizOption {
   });
 }
 
+/// Pergunta do quiz com categoria, enunciado e lista de opções.
 class QuizQuestion {
   final String category;
   final String prompt;

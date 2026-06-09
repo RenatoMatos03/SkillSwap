@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_tokens.dart';
 
+/// Tile de definição com ação de toque e seta indicativa.
 class SettingsActionTile extends StatelessWidget {
   final IconData icon;
   final Color iconBg;
@@ -39,6 +40,7 @@ class SettingsActionTile extends StatelessWidget {
   }
 }
 
+/// Tile de definição com interruptor (switch).
 class SettingsSwitchTile extends StatelessWidget {
   final IconData icon;
   final Color iconBg;

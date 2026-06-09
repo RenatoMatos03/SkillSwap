@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Modelo de escola do fórum.
 class School {
   String? id;
   final String acronym;
@@ -15,6 +16,7 @@ class School {
     required this.icon,
   });
 
+  /// Converte a escola para um mapa compatível com o Firestore.
   Map<String, dynamic> toMap() {
     return {
       'acronym': acronym,
@@ -24,6 +26,7 @@ class School {
     };
   }
 
+  /// Constrói uma [School] a partir de um mapa Firestore.
   factory School.fromMap(Map<String, dynamic> map, String docId) {
     return School(
       id: docId,

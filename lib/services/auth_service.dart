@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+/// Serviço de autenticação Firebase com registo, login e recuperação de password.
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Emite o utilizador atual sempre que o estado de auth muda (login/logout/app restart)
+  /// Emite o utilizador atual sempre que o estado de autenticação muda.
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   User? get currentUser => _auth.currentUser;
 
+  /// Regista um novo utilizador com email e password.
   Future<UserCredential> register(String email, String password) async {
     try {
       return await _auth.createUserWithEmailAndPassword(
@@ -19,6 +21,7 @@ class AuthService {
     }
   }
 
+  /// Autentica um utilizador existente com email e password.
   Future<UserCredential> login(String email, String password) async {
     try {
       return await _auth.signInWithEmailAndPassword(
@@ -30,6 +33,7 @@ class AuthService {
     }
   }
 
+  /// Envia um email de verificação para o utilizador atual.
   Future<void> sendEmailVerification() async {
     try {
       await _auth.currentUser?.sendEmailVerification();
@@ -38,11 +42,13 @@ class AuthService {
     }
   }
 
+  /// Recarrega o utilizador e devolve se o email está verificado.
   Future<bool> checkEmailVerified() async {
     await _auth.currentUser?.reload();
     return _auth.currentUser?.emailVerified ?? false;
   }
 
+  /// Envia um email de recuperação de password para o endereço indicado.
   Future<void> sendPasswordReset(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
@@ -55,6 +61,7 @@ class AuthService {
     await _auth.signOut();
   }
 
+  /// Traduz erros do Firebase Authentication para mensagens legíveis em português.
   String _handleAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':

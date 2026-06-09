@@ -5,16 +5,12 @@ import 'screens/auth/login_page.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
-  // É obrigatório adicionar esta linha antes de usar o SystemChrome no main()
-  WidgetsFlutterBinding.ensureInitialized(); 
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // Ocultar as barras de cima e de baixo (Modo Imersivo)
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  // Garante que o Flutter está pronto antes de inicializar o Firebase
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Inicializa o Firebase com as opções geradas
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -22,6 +18,7 @@ void main() async {
   runApp(const MyApp());
 }
 
+/// Ponto de entrada da aplicação SkillSwap.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

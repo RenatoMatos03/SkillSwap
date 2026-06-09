@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_tokens.dart';
 
+/// Botão de fecho para bottom sheets.
 class SheetCloseButton extends StatelessWidget {
   final String label;
 

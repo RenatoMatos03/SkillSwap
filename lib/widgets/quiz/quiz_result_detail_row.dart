@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Linha de detalhe individual para o ecrã de resultado do quiz.
 class QuizResultDetailRow extends StatelessWidget {
   final IconData icon;
   final Color iconColor;

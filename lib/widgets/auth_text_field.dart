@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Campo de texto estilizado para formulários de autenticação.
 class AuthTextField extends StatelessWidget {
   final String label;
   final String hintText;

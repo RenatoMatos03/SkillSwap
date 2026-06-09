@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_tokens.dart';
 
+/// Cartão de boas-vindas com saudação personalizada e streak do utilizador.
 class HomeGreetingCard extends StatelessWidget {
   final String greeting;
   final String streakText;

@@ -8,6 +8,7 @@ import '../../widgets/forum/widgets_forum.dart';
 import 'forum_question_details_page.dart';
 import 'forum_create_question_page.dart';
 
+/// Ecrã de listagem de perguntas de uma disciplina com pesquisa e filtros.
 class ForumQuestionsPage extends StatefulWidget {
   final String subjectName;
 
@@ -29,7 +30,7 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
   void initState() {
     super.initState();
     _shakeController = AnimationController(
-      vsync: this, 
+      vsync: this,
       duration: const Duration(milliseconds: 400),
     );
   }
@@ -40,6 +41,7 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
     super.dispose();
   }
 
+  /// Abre o diálogo de filtros e aplica as opções selecionadas à listagem.
   void _showFilterModal(BuildContext context) {
     String tempOrder = _selectedOrder;
     String tempState = _selectedState;
@@ -94,7 +96,6 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // O COMPONENTE GIGANTE FOI MOVIDO DAQUI E ENCAPSULADO ABAIXO!
       floatingActionButton: _ForumCreateQuestionFab(
         subjectName: widget.subjectName,
         shakeController: _shakeController,
@@ -105,12 +106,12 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
           children: [
             ForumPageHeader(title: widget.subjectName),
             SearchAndFilterBar(
-              hintText: "Pesquisar pergunta...", 
+              hintText: "Pesquisar pergunta...",
               onFilterTap: () => _showFilterModal(context),
               onChanged: (value) => setState(() => _searchQuery = value),
             ),
             const SizedBox(height: 20),
-            
+
             Expanded(
               child: StreamBuilder<List<Question>>(
                 stream: ForumService().getQuestionsStream(widget.subjectName),
@@ -144,7 +145,7 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
                       const SizedBox(height: 16),
                       Expanded(
                         child: ListView.builder(
-                          padding: const EdgeInsets.only(bottom: 80), 
+                          padding: const EdgeInsets.only(bottom: 80),
                           itemCount: filtered.length,
                           itemBuilder: (context, index) => QuestionCard(
                             question: filtered[index],
@@ -169,7 +170,7 @@ class _ForumQuestionsPageState extends State<ForumQuestionsPage> with SingleTick
   }
 }
 
-/// CLASSE ENCAPSULADA: Botão flutuante que gere a sua própria ligação ao Firebase e Animações
+/// Botão flutuante de criação de pergunta com verificação de saldo em tempo real.
 class _ForumCreateQuestionFab extends StatelessWidget {
   final String subjectName;
   final AnimationController shakeController;
@@ -184,7 +185,7 @@ class _ForumCreateQuestionFab extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     return StreamBuilder<DocumentSnapshot>(
-      stream: currentUser != null 
+      stream: currentUser != null
           ? FirebaseFirestore.instance.collection('users').doc(currentUser.uid).snapshots()
           : const Stream.empty(),
       builder: (context, snapshot) {
@@ -193,20 +194,20 @@ class _ForumCreateQuestionFab extends StatelessWidget {
           final data = snapshot.data!.data() as Map<String, dynamic>;
           coins = data['coins'] ?? 0;
         }
-        
+
         bool hasEnoughCoins = coins >= 2;
 
         return AnimatedBuilder(
           animation: shakeController,
           builder: (context, child) {
             final sineValue = sin(4 * pi * shakeController.value);
-            
+
             return Transform.translate(
-              offset: Offset(sineValue * 8, 0), 
+              offset: Offset(sineValue * 8, 0),
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 32.0), 
+                padding: const EdgeInsets.only(bottom: 32.0),
                 child: SizedBox(
-                  height: 65, width: 260, 
+                  height: 65, width: 260,
                   child: FloatingActionButton.extended(
                     backgroundColor: hasEnoughCoins ? const Color(0xFF009191) : Colors.grey[400],
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
@@ -220,26 +221,26 @@ class _ForumCreateQuestionFab extends StatelessWidget {
                             duration: Duration(seconds: 4),
                           ),
                         );
-                        return; 
+                        return;
                       }
 
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => ForumCreateQuestionPage(subjectName: subjectName)),
                       );
-                      
+
                       if (result != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Pergunta publicada com sucesso! Foram descontadas 2 moedas."), backgroundColor: Colors.teal),
                         );
                       }
                     },
-                    icon: Icon(Icons.add_circle_outline, color: hasEnoughCoins ? Colors.white : Colors.white70, size: 28), 
+                    icon: Icon(Icons.add_circle_outline, color: hasEnoughCoins ? Colors.white : Colors.white70, size: 28),
                     label: Column(
-                      mainAxisAlignment: MainAxisAlignment.center, 
-                      children: [ 
-                        Text("Fazer uma Pergunta", style: TextStyle(color: hasEnoughCoins ? Colors.white : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)), 
-                        Text("custa 2 moedas", style: TextStyle(color: hasEnoughCoins ? Colors.white70 : Colors.white60, fontSize: 11)) 
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Fazer uma Pergunta", style: TextStyle(color: hasEnoughCoins ? Colors.white : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text("custa 2 moedas", style: TextStyle(color: hasEnoughCoins ? Colors.white70 : Colors.white60, fontSize: 11))
                       ]
                     ),
                   ),

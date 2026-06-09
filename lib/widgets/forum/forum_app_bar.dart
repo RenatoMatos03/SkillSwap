@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets.dart'; 
+import '../widgets.dart';
 
+/// AppBar reutilizável para as páginas do fórum.
 class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
@@ -23,7 +24,7 @@ class ForumAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       actions: const [
-        AppBalanceChip(), 
+        AppBalanceChip(),
         SizedBox(width: 8),
         AppUserAvatar(initials: 'MR'),
         SizedBox(width: 16),

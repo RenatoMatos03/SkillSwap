@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets.dart';
 
+/// Exibe um diálogo de filtros que desce do topo do ecrã.
 void showTopFilterDialog({
   required BuildContext context,
   required String title,

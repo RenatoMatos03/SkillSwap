@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_tokens.dart';
 
+/// Cartão de estatística individual para o separador de estatísticas do perfil.
 class ProfileStatCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;

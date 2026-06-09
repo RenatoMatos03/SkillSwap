@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Modelo de notícia ou dica para o carrossel da página inicial.
 class NewsItem {
   final String tag;
   final String title;
@@ -14,6 +15,7 @@ class NewsItem {
   });
 }
 
+/// Modelo de item do leaderboard com campo Firestore e sufixo de valor.
 class LeaderboardItem {
   final String title;
   final String subtitle;
@@ -29,4 +31,3 @@ class LeaderboardItem {
     required this.valueSuffix,
   });
 }
-

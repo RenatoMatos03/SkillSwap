@@ -4,6 +4,7 @@ import '../../models/forum/question.dart';
 import '../../services/forum_service.dart';
 import 'custom_badge.dart';
 
+/// Cartão de curso para listagem no fórum com contagem de perguntas em tempo real.
 class CourseCard extends StatefulWidget {
   final Course course;
   final VoidCallback onTap;
@@ -20,8 +21,8 @@ class _CourseCardState extends State<CourseCard> {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(16.0);
-    final hoverColor = Colors.grey.withValues(alpha: 0.05); 
-    final splashColor = widget.course.color.withValues(alpha: 0.1); 
+    final hoverColor = Colors.grey.withValues(alpha: 0.05);
+    final splashColor = widget.course.color.withValues(alpha: 0.1);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -51,7 +52,7 @@ class _CourseCardState extends State<CourseCard> {
             color: Colors.transparent,
             child: InkWell(
               onTap: widget.onTap,
-              hoverColor: hoverColor, 
+              hoverColor: hoverColor,
               splashColor: splashColor,
               child: IntrinsicHeight(
                 child: Row(
@@ -111,7 +112,6 @@ class _CourseCardState extends State<CourseCard> {
                                       StreamBuilder<List<Question>>(
                                         stream: ForumService().getQuestionsStream(widget.course.acronym),
                                         builder: (context, snapshot) {
-                                          // Conta quantas perguntas chegaram do Firebase
                                           int count = snapshot.hasData ? snapshot.data!.length : 0;
                                           return Text(
                                             "$count perguntas",

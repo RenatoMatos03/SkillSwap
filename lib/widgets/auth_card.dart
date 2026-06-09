@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Cartão com sombra suave usado como contentor nos formulários de autenticação.
 class AuthCard extends StatelessWidget {
   final Widget child;
 

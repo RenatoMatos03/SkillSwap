@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Faixa de feedback que indica se a resposta do utilizador foi correta ou incorreta.
 class QuizFeedbackBanner extends StatelessWidget {
   final bool isCorrect;
   final String correctLetter;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_tokens.dart';
 
+/// Chip de skill para apresentar uma competência no perfil.
 class ProfileSkillChip extends StatelessWidget {
   final String label;
 

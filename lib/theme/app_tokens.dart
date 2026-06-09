@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Paleta de cores da aplicação.
 class AppColors {
   static const Color primary = Color(0xFF009191);
   static const Color primaryDark = Color(0xFF006064);
@@ -16,12 +17,14 @@ class AppColors {
   static const Color indicatorInactive = Color(0xFFD5E7E6);
 }
 
+/// Raios de borda reutilizáveis.
 class AppRadii {
   static const double pill = 999;
   static const double md = 12;
   static const double lg = 18;
 }
 
+/// Espaçamentos padrão da aplicação.
 class AppSpacing {
   static const double xs = 6;
   static const double sm = 8;

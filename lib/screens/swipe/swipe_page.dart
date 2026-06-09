@@ -5,6 +5,7 @@ import '../../models/user_profile.dart';
 import '../../widgets/student_card.dart';
 import 'match_page.dart';
 
+/// Ecrã de swipe para encontrar utilizadores com competências compatíveis.
 class SwipePage extends StatefulWidget {
   const SwipePage({super.key});
 
@@ -23,6 +24,7 @@ class _SwipePageState extends State<SwipePage> {
     _fetchUsers();
   }
 
+  /// Obtém os utilizadores cujas tags de oferta coincidem com as tags de procura do utilizador atual.
   Future<void> _fetchUsers() async {
     try {
       final currentUserAuth = FirebaseAuth.instance.currentUser;
@@ -30,7 +32,6 @@ class _SwipePageState extends State<SwipePage> {
 
       final myUid = currentUserAuth.uid;
 
-      // Busca o meu perfil para saber o que preciso
       final myDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(myUid)
@@ -42,7 +43,6 @@ class _SwipePageState extends State<SwipePage> {
           .map((t) => t.trim().toLowerCase())
           .toList();
 
-      // Busca todos os utilizadores
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .get();
@@ -50,7 +50,6 @@ class _SwipePageState extends State<SwipePage> {
           .map((doc) => UserProfile.fromMap(doc.id, doc.data()))
           .toList();
 
-      // Filtra apenas quem oferece o que eu preciso e não sou eu
       final matchedUsers = allUsers.where((otherUser) {
         if (otherUser.uid == myUid) return false;
         if (myNeedsNormalized.isEmpty) return false;
@@ -71,6 +70,7 @@ class _SwipePageState extends State<SwipePage> {
     }
   }
 
+  /// Processa o gesto de arrasto para match, skip ou voltar atrás.
   void _onPanEnd(DragEndDetails details) {
     if (_profiles.isEmpty) return;
 
@@ -78,7 +78,6 @@ class _SwipePageState extends State<SwipePage> {
     double dx = details.velocity.pixelsPerSecond.dx;
     double dy = details.velocity.pixelsPerSecond.dy;
 
-    // 🔥 SE ESTIVERMOS NO FIM DA LISTA: Só permitimos voltar atrás (agora para a DIREITA)
     if (_currentIndex >= _profiles.length) {
       if (dx > velocityThreshold && _currentIndex > 0) {
         setState(() {
@@ -88,9 +87,6 @@ class _SwipePageState extends State<SwipePage> {
       return;
     }
 
-    // 🔥 SE AINDA HOUVER CARTÕES, FAZ A LÓGICA NORMAL:
-
-    // Swipe para cima -> MATCH!
     if (dy < -velocityThreshold && dy.abs() > dx.abs()) {
       final matchedUser = _profiles[_currentIndex];
       final myUid = FirebaseAuth.instance.currentUser!.uid;
@@ -110,13 +106,11 @@ class _SwipePageState extends State<SwipePage> {
         });
       });
     }
-    // Swipe para a ESQUERDA -> SKIP (Avança perfil)
     else if (dx < -velocityThreshold) {
       setState(() {
         _currentIndex++;
       });
     }
-    // Swipe para a DIREITA -> VOLTAR ATRÁS
     else if (dx > velocityThreshold) {
       if (_currentIndex > 0) {
         setState(() {
@@ -141,11 +135,9 @@ class _SwipePageState extends State<SwipePage> {
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF009191)),
             )
-          // 🔥 Movemos o GestureDetector para fora, para abranger o ecrã final também!
           : GestureDetector(
               onPanEnd: _onPanEnd,
-              behavior: HitTestBehavior
-                  .opaque, // Importante para detetar o toque no ecrã vazio
+              behavior: HitTestBehavior.opaque,
               child: _profiles.isEmpty
                   ? _buildNoProfilesMessage()
                   : _currentIndex >= _profiles.length

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/quiz_models.dart';
 
+/// Cartão que apresenta o enunciado e categoria de uma pergunta do quiz.
 class QuizQuestionCard extends StatelessWidget {
   final QuizQuestion question;
   final int questionNumber;

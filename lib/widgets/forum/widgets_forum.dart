@@ -1,4 +1,3 @@
-// Exporta todos os widgets específicos do Fórum
 export 'comment_input.dart';
 export 'comment_item.dart';
 export 'course_card.dart';

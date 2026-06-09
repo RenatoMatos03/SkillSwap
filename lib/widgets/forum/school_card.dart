@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/school.dart';
-import '../../models/forum/course.dart'; 
-import '../../services/forum_service.dart'; 
+import '../../models/forum/course.dart';
+import '../../services/forum_service.dart';
 
+/// Cartão de escola para a grelha de escolas do fórum.
 class SchoolCard extends StatefulWidget {
   final School school;
   final VoidCallback onTap;
@@ -30,7 +31,6 @@ class _SchoolCardState extends State<SchoolCard> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            // AQUI ESTÁ O AJUSTE: Sombra mais pronunciada
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: _isHovered ? 0.15 : 0.06),
@@ -58,7 +58,7 @@ class _SchoolCardState extends State<SchoolCard> {
                 ),
               ),
               const SizedBox(height: 12),
-              
+
               StreamBuilder<List<Course>>(
                 stream: ForumService().getCoursesStream(widget.school.acronym),
                 builder: (context, snapshot) {

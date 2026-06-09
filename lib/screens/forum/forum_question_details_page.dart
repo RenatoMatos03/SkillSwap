@@ -6,8 +6,9 @@ import '../../services/forum_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import '../../widgets/widgets.dart';
-import '../../utils/utils.dart'; // <--- O TEU NOVO IMPORT LIMPO
+import '../../utils/utils.dart';
 
+/// Ecrã de detalhes de uma pergunta do fórum com comentários e respostas.
 class ForumQuestionDetailsPage extends StatefulWidget {
   final Question question;
 
@@ -20,10 +21,10 @@ class ForumQuestionDetailsPage extends StatefulWidget {
 class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
   final FocusNode _commentFocusNode = FocusNode();
   final TextEditingController _commentController = TextEditingController();
-  
-  bool _sortDescending = true;  
-  CommentModel? _replyingTo;    
-  String? _replyingToRootId; 
+
+  bool _sortDescending = true;
+  CommentModel? _replyingTo;
+  String? _replyingToRootId;
   late bool _isResolved;
 
   @override
@@ -39,6 +40,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
     super.dispose();
   }
 
+  /// Publica um comentário ou resposta na pergunta atual.
   Future<void> _submitComment() async {
     String text = _commentController.text.trim();
     if (text.isEmpty) return;
@@ -50,10 +52,9 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
 
     final newComment = CommentModel(
       id: generatedId,
-      parentCommentId: _replyingTo?.id, 
+      parentCommentId: _replyingTo?.id,
       userId: uid,
       userName: profile?.name ?? "Utilizador",
-      // CHAMA A FUNÇÃO GLOBAL AQUI
       userInitials: profile != null ? getInitials(profile.name) : "U",
       badge: profile?.course ?? "IPS",
       createdAt: DateTime.now(),
@@ -76,6 +77,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
     _commentFocusNode.unfocus();
   }
 
+  /// Mostra diálogo de confirmação e marca o comentário como solução aceite.
   void _confirmAndMarkSolution(CommentModel comment) {
     showDialog(
       context: context,
@@ -84,7 +86,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
         content: "Tens a certeza que queres marcar esta resposta como a solução?\n\nEsta ação não pode ser revertida e o autor receberá 2 moedas.",
         onConfirm: () async {
           await ForumService().markAsSolution(widget.question.id!, comment.id!, comment.userId);
-          setState(() => _isResolved = true); 
+          setState(() => _isResolved = true);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Solução aceite!"), backgroundColor: Colors.green)
@@ -95,18 +97,19 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
     );
   }
 
+  /// Mostra diálogo de confirmação e elimina a pergunta atual.
   void _showDeleteConfirmation() {
     showDialog(
       context: context,
       builder: (ctx) => CustomConfirmationDialog(
         title: "Eliminar Questão?",
         content: "Irá apagar a sua questão.\n\nNão conseguirá reverter esta ação e não receberá as moedas de volta. Tem a certeza?",
-        confirmText: "Eliminar", 
+        confirmText: "Eliminar",
         onConfirm: () async {
           await ForumService().deleteQuestion(widget.question.id!, widget.question.subjectName);
-          
+
           if (mounted) {
-            Navigator.pop(context); 
+            Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("A questão foi eliminada com sucesso."), backgroundColor: Colors.teal)
             );
@@ -117,7 +120,6 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
   }
 
   Widget _buildAuthorHeader(bool isOwner) {
-    // CHAMA A FUNÇÃO GLOBAL AQUI
     final String acronym = getCourseAcronym(widget.question.userCourse);
 
     return Padding(
@@ -138,7 +140,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                   runSpacing: 4,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(widget.question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)), 
+                    Text(widget.question.userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     if (acronym.isNotEmpty)
                       CustomBadge(text: acronym, textColor: const Color(0xFF009191), bgColor: const Color(0xFF009191).withValues(alpha: 0.1))
                   ]
@@ -149,14 +151,14 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                   runSpacing: 4,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    CustomBadge(text: _isResolved ? "Resolvida" : "Aberta", textColor: _isResolved ? const Color(0xFF009191) : Colors.grey[700]!, bgColor: _isResolved ? const Color(0xFFE0F2F1) : Colors.grey[200]!, icon: _isResolved ? Icons.check_circle : Icons.circle_outlined), 
+                    CustomBadge(text: _isResolved ? "Resolvida" : "Aberta", textColor: _isResolved ? const Color(0xFF009191) : Colors.grey[700]!, bgColor: _isResolved ? const Color(0xFFE0F2F1) : Colors.grey[200]!, icon: _isResolved ? Icons.check_circle : Icons.circle_outlined),
                     Text("há ${widget.question.timeAgo}", style: const TextStyle(color: Colors.grey, fontSize: 12))
                   ]
                 )
               ],
             ),
           ),
-          
+
           if (isOwner)
             Theme(
               data: Theme.of(context).copyWith(
@@ -207,7 +209,7 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
               stream: ForumService().getCommentsStream(widget.question.id!),
               builder: (context, snapshot) {
                 List<CommentModel> commentsTree = snapshot.data ?? [];
-                
+
                 commentsTree.sort((a, b) {
                   if (a.isSolution && !b.isSolution) return -1;
                   if (!a.isSolution && b.isSolution) return 1;
@@ -217,10 +219,10 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                 return ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
-                    _buildAuthorHeader(isOwner), 
+                    _buildAuthorHeader(isOwner),
                     QuestionFullBody(question: widget.question),
                     const SizedBox(height: 32),
-                    
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -232,23 +234,23 @@ class _ForumQuestionDetailsPageState extends State<ForumQuestionDetailsPage> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    
+
                     ...commentsTree.map((comment) {
                       final bool canAccept = isOwner && !_isResolved && comment.userId != currentUserId;
 
                       return CommentItem(
-                        key: ValueKey(comment.id), 
+                        key: ValueKey(comment.id),
                         questionId: widget.question.id!,
-                        rootCommentId: comment.id!, 
+                        rootCommentId: comment.id!,
                         comment: comment,
-                        onReply: (rootId, c) { 
+                        onReply: (rootId, c) {
                           setState(() {
                             _replyingToRootId = rootId;
                             _replyingTo = c;
                           });
                           _commentFocusNode.requestFocus();
                         },
-                        showAcceptButton: canAccept, 
+                        showAcceptButton: canAccept,
                         onSolutionToggled: () => _confirmAndMarkSolution(comment),
                       );
                     }),

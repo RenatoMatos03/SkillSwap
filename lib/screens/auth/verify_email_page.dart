@@ -3,6 +3,7 @@ import '../../services/auth_service.dart';
 import '../../widgets/widgets.dart';
 import 'personal_data_page.dart';
 
+/// Ecrã de verificação de email após o registo.
 class VerifyEmailPage extends StatefulWidget {
   final String email;
 
@@ -19,6 +20,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   bool _isResending = false;
   String? _errorMessage;
 
+  /// Verifica se o email foi confirmado e redireciona para os dados pessoais.
   Future<void> _checkVerified() async {
     setState(() {
       _isChecking = true;
@@ -42,6 +44,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     }
   }
 
+  /// Reenvía o email de verificação ao utilizador.
   Future<void> _resendEmail() async {
     setState(() => _isResending = true);
     try {

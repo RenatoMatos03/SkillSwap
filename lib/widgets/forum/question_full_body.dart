@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/question.dart';
 
+/// Corpo completo de uma pergunta com título, tags e descrição.
 class QuestionFullBody extends StatelessWidget {
   final Question question;
 
@@ -16,8 +17,8 @@ class QuestionFullBody extends StatelessWidget {
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1D204B), height: 1.3),
         ),
         const SizedBox(height: 12),
-        
-        if (question.tags.isNotEmpty) 
+
+        if (question.tags.isNotEmpty)
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -27,9 +28,9 @@ class QuestionFullBody extends StatelessWidget {
               child: Text("#$tag", style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
             )).toList(),
           ),
-          
+
         const SizedBox(height: 16),
-        
+
         Text(
           question.description,
           textAlign: TextAlign.justify,

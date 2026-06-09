@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_tokens.dart';
 
+/// Chip que exibe o saldo de moedas do utilizador em tempo real.
 class AppBalanceChip extends StatelessWidget {
   final VoidCallback? onTap;
 
@@ -13,14 +14,13 @@ class AppBalanceChip extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     return StreamBuilder<DocumentSnapshot>(
-      stream: currentUser != null 
+      stream: currentUser != null
           ? FirebaseFirestore.instance.collection('users').doc(currentUser.uid).snapshots()
           : const Stream.empty(),
       builder: (context, snapshot) {
-        
+
         String displayValue = '0';
-        
-        // Se houver dados, atualizamos o valor a mostrar
+
         if (snapshot.hasData && snapshot.data!.exists) {
           final data = snapshot.data!.data() as Map<String, dynamic>;
           displayValue = (data['coins'] ?? 0).toString();
@@ -60,6 +60,7 @@ class AppBalanceChip extends StatelessWidget {
   }
 }
 
+/// Avatar circular do utilizador com suporte a foto de perfil ou iniciais.
 class AppUserAvatar extends StatelessWidget {
   final String initials;
   final String photoUrl;

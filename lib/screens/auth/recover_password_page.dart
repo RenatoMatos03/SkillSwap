@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/widgets.dart';
 
+/// Ecrã de recuperação de password por email.
 class RecoverPasswordPage extends StatefulWidget {
   const RecoverPasswordPage({super.key});
 
@@ -23,6 +24,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
     super.dispose();
   }
 
+  /// Envia o email de recuperação de password para o endereço introduzido.
   Future<void> _sendReset() async {
     final email = _emailController.text.trim();
 

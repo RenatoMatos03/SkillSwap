@@ -4,6 +4,7 @@ import '../../services/forum_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import 'forum_questions_page.dart';
 
+/// Ecrã de listagem dos cursos de uma escola com pesquisa, filtros e agrupamento.
 class ForumCoursesPage extends StatefulWidget {
   final String schoolName;
 
@@ -18,6 +19,7 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
   String _selectedOrder = "Padrão";
   String _selectedGroup = "Sem agrupamento";
 
+  /// Abre o diálogo de filtros e aplica as opções selecionadas.
   void _showFilterModal(BuildContext context) {
     String tempOrder = _selectedOrder;
     String tempGroup = _selectedGroup;
@@ -95,16 +97,13 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                     );
                   }
 
-                  // Filtrar pela pesquisa
                   List<Course> filtered = snapshot.data!.where((course) {
                     final searchLower = _searchQuery.toLowerCase();
                     return course.name.toLowerCase().contains(searchLower) ||
                            course.acronym.toLowerCase().contains(searchLower);
                   }).toList();
 
-                  // Ordenação Combinada (Primeiro Grupo, Depois Ordem)
                   filtered.sort((a, b) {
-                    // Sort do Grupo
                     if (_selectedGroup == "Tipo de curso") {
                       int groupCmp = a.type.compareTo(b.type);
                       if (groupCmp != 0) return groupCmp;
@@ -113,7 +112,6 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                       if (groupCmp != 0) return groupCmp;
                     }
 
-                    // Sort da Ordem (aplica-se dentro de cada grupo)
                     if (_selectedOrder == "Alfabético A-Z") {
                       return a.acronym.compareTo(b.acronym);
                     } else if (_selectedOrder == "Alfabético Z-A") {
@@ -121,14 +119,14 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                     } else if (_selectedOrder == "+ Perguntas") {
                       int countCmp = b.questionsCount.compareTo(a.questionsCount);
                       if (countCmp != 0) return countCmp;
-                      return a.acronym.compareTo(b.acronym); // Desempate alfabético
+                      return a.acronym.compareTo(b.acronym);
                     } else if (_selectedOrder == "- Perguntas") {
                       int countCmp = a.questionsCount.compareTo(b.questionsCount);
                       if (countCmp != 0) return countCmp;
-                      return a.acronym.compareTo(b.acronym); // Desempate alfabético
+                      return a.acronym.compareTo(b.acronym);
                     }
 
-                    return 0; // Padrão
+                    return 0;
                   });
 
                   return Column(
@@ -152,7 +150,7 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
 
                             if (_selectedGroup != "Sem agrupamento") {
                               groupTitle = _selectedGroup == "Tipo de curso" ? course.type : course.area;
-                              
+
                               if (index == 0) {
                                 showGroupHeader = true;
                               } else {
@@ -164,9 +162,8 @@ class _ForumCoursesPageState extends State<ForumCoursesPage> {
                               }
                             }
 
-                            // O Cartão do Curso
                             Widget courseCard = CourseCard(
-                              course: course, 
+                              course: course,
                               onTap: () {
                                 Navigator.push(
                                   context,

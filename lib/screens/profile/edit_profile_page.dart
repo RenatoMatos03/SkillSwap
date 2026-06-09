@@ -8,6 +8,7 @@ import '../../theme/app_tokens.dart';
 import '../../widgets/profile/profile_widgets.dart';
 import '../../widgets/widgets.dart';
 
+/// Ecrã de edição do perfil do utilizador com foto, bio, escola e tags.
 class EditProfilePage extends StatefulWidget {
   final UserProfile profile;
   final VoidCallback onSaved;
@@ -104,6 +105,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     await _loadCourses(school);
   }
 
+  /// Guarda as alterações do perfil no Firestore e fecha o ecrã.
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
@@ -131,6 +133,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+  /// Adiciona uma tag à lista se não estiver vazia nem duplicada.
   void _addTag(List<String> list, TextEditingController controller) {
     final value = controller.text.trim();
     if (value.isEmpty || list.contains(value)) return;

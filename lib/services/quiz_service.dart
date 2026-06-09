@@ -3,10 +3,12 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../models/quiz_models.dart';
 
+/// Serviço que obtém e processa perguntas do quiz a partir da Open Trivia Database.
 class QuizService {
   static const _apiUrl =
     'https://opentdb.com/api.php?amount=10&category=18&type=multiple';
 
+  /// Obtém 10 perguntas de informática e devolve-as formatadas.
   Future<List<QuizQuestion>> fetchQuestions() async {
     final response = await http.get(Uri.parse(_apiUrl));
 
@@ -25,6 +27,7 @@ class QuizService {
     return results.map((q) => _mapQuestion(q as Map<String, dynamic>)).toList();
   }
 
+  /// Converte um resultado da API numa [QuizQuestion] com opções baralhas.
   QuizQuestion _mapQuestion(Map<String, dynamic> q) {
     final correctAnswer = _decode(q['correct_answer'] as String);
     final incorrectAnswers =
@@ -49,6 +52,7 @@ class QuizService {
     );
   }
 
+  /// Descodifica entidades HTML presentes nas respostas da API.
   String _decode(String text) {
     return text
       .replaceAll('&amp;', '&')

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Ecrã de confirmação de match entre dois utilizadores.
 class MatchPage extends StatelessWidget {
   final String profileName;
 
@@ -8,14 +9,13 @@ class MatchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Colors.white, // Alterado para branco (ou a cor da tua preferência)
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
-              Icons.check_circle_outline, // O ícone do certo que pediste
+              Icons.check_circle_outline,
               color: Color(0xFF009191),
               size: 100,
             ),

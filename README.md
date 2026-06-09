@@ -91,7 +91,6 @@ flutter run
 
 - `flutter analyze` — análise de código
 - `flutter pub outdated` — verificar dependências desatualizadas
-- `flutter test` — executar testes (quando implementados)
 
 ## Configuração Firebase
 

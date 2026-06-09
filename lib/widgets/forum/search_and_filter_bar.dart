@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Barra de pesquisa com botão de filtro para listagens do fórum.
 class SearchAndFilterBar extends StatelessWidget {
   final String hintText;
   final VoidCallback onFilterTap;
   final ValueChanged<String>? onChanged;
 
   const SearchAndFilterBar({
-    super.key, 
-    required this.hintText, 
+    super.key,
+    required this.hintText,
     required this.onFilterTap,
     this.onChanged,
   });

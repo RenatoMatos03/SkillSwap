@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../services/user_service.dart';
 import '../../widgets/quiz/quiz_widgets.dart';
 
+/// Ecrã de resultado do quiz com pontuação e atualização automática de moedas.
 class QuizResultPage extends StatefulWidget {
   final int score;
   final int totalQuestions;
@@ -25,6 +26,7 @@ class _QuizResultPageState extends State<QuizResultPage> {
     _save();
   }
 
+  /// Regista o quiz como concluído e adiciona as moedas ganhas ao perfil.
   Future<void> _save() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;

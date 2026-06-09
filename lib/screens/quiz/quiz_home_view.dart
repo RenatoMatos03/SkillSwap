@@ -8,6 +8,7 @@ import '../../services/user_service.dart';
 import '../../widgets/quiz/quiz_widgets.dart';
 import 'quiz_question_page.dart';
 
+/// Vista inicial do quiz semanal com estado de bloqueio baseado na semana atual.
 class QuizHomeView extends StatefulWidget {
   const QuizHomeView({super.key});
 
@@ -28,6 +29,7 @@ class _QuizHomeViewState extends State<QuizHomeView> {
     _loadQuestions();
   }
 
+  /// Obtém as perguntas do quiz a partir da API.
   Future<void> _loadQuestions() async {
     setState(() { _isLoading = true; _error = null; });
     try {

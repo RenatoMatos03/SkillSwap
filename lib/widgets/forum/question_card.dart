@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/forum/question.dart';
 import 'custom_badge.dart';
 
+/// Cartão resumido de uma pergunta para listagens do fórum.
 class QuestionCard extends StatefulWidget {
   final Question question;
   final VoidCallback onTap;
@@ -19,7 +20,7 @@ class _QuestionCardState extends State<QuestionCard> {
   Widget build(BuildContext context) {
     bool isResolved = widget.question.status == "Resolvida";
     final borderRadius = BorderRadius.circular(16.0);
-    
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
@@ -34,13 +35,13 @@ class _QuestionCardState extends State<QuestionCard> {
           color: Colors.white,
           borderRadius: borderRadius,
           border: Border.all(
-            color: isResolved 
-              ? const Color(0xFF009191).withValues(alpha: _isHovered ? 0.6 : 0.3) 
-              : Colors.grey.withValues(alpha: _isHovered ? 0.4 : 0.2) // Corrigido
+            color: isResolved
+              ? const Color(0xFF009191).withValues(alpha: _isHovered ? 0.6 : 0.3)
+              : Colors.grey.withValues(alpha: _isHovered ? 0.4 : 0.2)
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: _isHovered ? 0.06 : 0.02), // Corrigido
+              color: Colors.black.withValues(alpha: _isHovered ? 0.06 : 0.02),
               blurRadius: _isHovered ? 12 : 10,
               spreadRadius: _isHovered ? 1 : 0,
               offset: _isHovered ? const Offset(0, 4) : const Offset(0, 0),
@@ -70,7 +71,7 @@ class _QuestionCardState extends State<QuestionCard> {
                     Text(widget.question.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1D204B))),
                     const SizedBox(height: 8),
                     Text(widget.question.description, style: TextStyle(fontSize: 13, color: Colors.grey[600]), maxLines: 3, overflow: TextOverflow.ellipsis),
-                    
+
                     if (widget.question.tags.isNotEmpty) ...[
                       const SizedBox(height: 12),
                       Wrap(
@@ -79,7 +80,7 @@ class _QuestionCardState extends State<QuestionCard> {
                         children: widget.question.tags.map((tag) => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF2F5F7), 
+                            color: const Color(0xFFF2F5F7),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(

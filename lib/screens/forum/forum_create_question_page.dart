@@ -6,10 +6,11 @@ import '../../services/forum_service.dart';
 import '../../services/user_service.dart';
 import '../../widgets/forum/widgets_forum.dart';
 import '../../widgets/widgets.dart';
-import '../../utils/utils.dart'; // <--- O TEU NOVO IMPORT LIMPO
+import '../../utils/utils.dart';
 
+/// Ecrã de criação de uma nova pergunta no fórum com custo de 2 moedas.
 class ForumCreateQuestionPage extends StatefulWidget {
-  final String subjectName; 
+  final String subjectName;
 
   const ForumCreateQuestionPage({super.key, required this.subjectName});
 
@@ -21,7 +22,7 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
   final TextEditingController _tagController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
-  
+
   final List<String> _tags = [];
   bool _isAnonymous = false;
   bool _isLoading = false;
@@ -29,10 +30,10 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
   @override
   void initState() {
     super.initState();
-    _loadUserPreferences(); // Carrega a preferência ao abrir
+    _loadUserPreferences();
   }
 
-  // NOVO MÉTODO
+  /// Carrega a preferência de modo anónimo do perfil do utilizador.
   Future<void> _loadUserPreferences() async {
     final profile = await UserService().getUserProfile();
     if (profile != null && mounted) {
@@ -62,6 +63,7 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
     setState(() => _tags.remove(tag));
   }
 
+  /// Valida os campos e mostra o diálogo de confirmação antes de publicar.
   void _confirmPublish() {
     if (_titleController.text.trim().isEmpty || _descController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,18 +77,19 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
       builder: (ctx) => CustomConfirmationDialog(
         title: "Publicar Pergunta?",
         content: "Tens a certeza que queres publicar esta pergunta?\n\nSerão descontadas 2 moedas do teu saldo.",
-        onConfirm: _executePublish, 
+        onConfirm: _executePublish,
       ),
     );
   }
 
+  /// Cria a pergunta no Firestore e desconta as moedas ao utilizador.
   Future<void> _executePublish() async {
     setState(() => _isLoading = true);
 
     try {
       final profile = await UserService().getUserProfile();
       final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-      
+
       final newQuestion = Question(
         userId: uid,
         subjectName: widget.subjectName,
@@ -97,20 +100,20 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
         userInitials: _isAnonymous ? "A" : (profile != null ? getInitials(profile.name) : "U"),
         userCourse: _isAnonymous ? "Anónimo" : (profile?.course ?? "IPS"),
         commentsCount: 0,
-        createdAt: DateTime.now(), 
+        createdAt: DateTime.now(),
         tags: List.from(_tags),
       );
 
       await ForumService().createQuestion(newQuestion);
-      
+
       if (uid.isNotEmpty) {
         await FirebaseFirestore.instance.collection('users').doc(uid).update({
-          'coins': FieldValue.increment(-2) 
+          'coins': FieldValue.increment(-2)
         });
       }
-      
+
       if (mounted) {
-        Navigator.pop(context, true); 
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erro: $e")));
@@ -134,10 +137,10 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             const SizedBox(height: 8),
             CustomTagInputField(controller: _tagController, hintText: "Ex: Base de Dados...", onAdd: _addTag),
             const SizedBox(height: 16),
-            
+
             if (_tags.isNotEmpty)
               Wrap(spacing: 8, runSpacing: 8, children: _tags.map((tag) => CustomTagChip(label: tag, onRemove: () => _removeTag(tag))).toList()),
-            
+
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,7 +153,7 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
             TextField(
               controller: _titleController,
               maxLength: 120,
-              onChanged: (_) => setState(() {}), 
+              onChanged: (_) => setState(() {}),
               decoration: InputDecoration(hintText: "Qual é a tua dúvida?", counterText: "", filled: true, fillColor: const Color(0xFFF2F5F7), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
             ),
             const SizedBox(height: 24),
@@ -183,7 +186,7 @@ class _ForumCreateQuestionPageState extends State<ForumCreateQuestionPage> {
 
             AuthButton(
               text: _isLoading ? "A publicar..." : "Publicar Pergunta",
-              onPressed: _isLoading ? null : _confirmPublish, 
+              onPressed: _isLoading ? null : _confirmPublish,
             ),
             const Center(
               child: Padding(

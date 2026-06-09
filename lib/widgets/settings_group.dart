@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Grupo de definições com fundo branco e bordas arredondadas.
 class SettingsGroup extends StatelessWidget {
   final List<Widget> children;
 
@@ -18,6 +19,7 @@ class SettingsGroup extends StatelessWidget {
   }
 }
 
+/// Divisor visual entre itens de definições.
 class SettingsDivider extends StatelessWidget {
   const SettingsDivider({super.key});
 

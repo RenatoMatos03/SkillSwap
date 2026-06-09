@@ -2,9 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../models/user_profile.dart';
 import '../../services/user_service.dart';
-import '../../widgets/widgets.dart'; // <--- Garante que exportas o custom_tag_input.dart aqui!
+import '../../widgets/widgets.dart';
 import '../home/home_page.dart';
 
+/// Ecrã do passo 2 do registo para definição de tags de procura e oferta.
 class AppDataPage extends StatefulWidget {
   final String name;
   final DateTime birthDate;
@@ -37,6 +38,7 @@ class _AppDataPageState extends State<AppDataPage> {
   final TextEditingController _procuraController = TextEditingController();
   final TextEditingController _ofertaController = TextEditingController();
 
+  /// Adiciona uma tag à lista caso o campo não esteja vazio.
   void _addTag(TextEditingController controller, List<String> lista) {
     if (controller.text.isNotEmpty) {
       setState(() {
@@ -78,7 +80,7 @@ class _AppDataPageState extends State<AppDataPage> {
                 const SizedBox(height: 8),
                 const Text("Define as tuas áreas de interesse e as que podes ensinar.", style: TextStyle(color: Colors.grey, fontSize: 15)),
                 const SizedBox(height: 25),
-                
+
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -163,7 +165,7 @@ class _AppDataPageState extends State<AppDataPage> {
                     }
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
 
                 Center(
@@ -198,19 +200,19 @@ class _AppDataPageState extends State<AppDataPage> {
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 13)),
         const SizedBox(height: 15),
-        
+
         CustomTagInputField(
           controller: controller,
           hintText: "Procurar tag...",
           onAdd: () => _addTag(controller, tags),
         ),
         const SizedBox(height: 15),
-        
+
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: tags.map((tag) => CustomTagChip(
-            label: tag, 
+            label: tag,
             onRemove: () => _removeTag(tag, tags)
           )).toList(),
         ),

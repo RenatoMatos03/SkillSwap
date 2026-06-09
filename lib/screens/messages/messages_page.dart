@@ -6,6 +6,7 @@ import '../../models/user_profile.dart';
 import '../../services/user_service.dart';
 import '../profile/profile_page.dart';
 
+/// Ecrã de ligações do utilizador com acesso ao WhatsApp e transferência de moedas.
 class MessagesPage extends StatelessWidget {
   const MessagesPage({super.key});
 
@@ -21,6 +22,7 @@ class MessagesPage extends StatelessWidget {
     return course.split(' ').first;
   }
 
+  /// Abre o WhatsApp com o número de telefone do utilizador selecionado.
   Future<void> _openWhatsApp(BuildContext context, String phoneNumber) async {
     if (phoneNumber.isEmpty) {
       ScaffoldMessenger.of(
@@ -42,6 +44,7 @@ class MessagesPage extends StatelessWidget {
     }
   }
 
+  /// Mostra diálogo para transferir moedas e avaliar o utilizador selecionado.
   void _showGiveCoinsDialog(BuildContext context, UserProfile otherUser) {
     final TextEditingController amountController = TextEditingController();
     double currentRating = 5.0;
@@ -57,7 +60,7 @@ class MessagesPage extends StatelessWidget {
               ),
               title: Text("Avaliar ${otherUser.name.split(' ').first}"),
               content: Column(
-                mainAxisSize: MainAxisSize.min, // Para não ocupar o ecrã todo
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: amountController,
@@ -77,7 +80,7 @@ class MessagesPage extends StatelessWidget {
                     min: 1,
                     max: 5,
                     divisions: 4,
-                    activeColor: Colors.amber, // Cor das estrelinhas
+                    activeColor: Colors.amber,
                     label: currentRating.toInt().toString(),
                     onChanged: (val) {
                       setDialogState(() {
@@ -207,7 +210,6 @@ class MessagesPage extends StatelessWidget {
                         if (value == 'coins') {
                           _showGiveCoinsDialog(context, p);
                         } else if (value == 'profile') {
-                          // Abre o teu ProfilePage existente
                           Navigator.push(
                             context,
                             MaterialPageRoute(

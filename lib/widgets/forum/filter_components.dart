@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Título de secção dentro de um painel de filtros.
 class FilterSectionTitle extends StatelessWidget {
   final String title;
   const FilterSectionTitle(this.title, {super.key});
@@ -13,6 +14,7 @@ class FilterSectionTitle extends StatelessWidget {
   }
 }
 
+/// Chip de filtro seleccionável por toque.
 class FilterChipWidget extends StatelessWidget {
   final String label;
   final bool isSelected;
@@ -43,6 +45,7 @@ class FilterChipWidget extends StatelessWidget {
   }
 }
 
+/// Opção de filtro com comportamento de rádio (selecção única).
 class FilterRadioOption extends StatelessWidget {
   final String label;
   final bool isSelected;
@@ -75,6 +78,7 @@ class FilterRadioOption extends StatelessWidget {
   }
 }
 
+/// Opção de filtro com comportamento de checkbox (selecção múltipla).
 class FilterCheckOption extends StatelessWidget {
   final String label;
   final bool isSelected;

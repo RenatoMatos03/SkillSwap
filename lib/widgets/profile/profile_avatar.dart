@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/string_utils.dart';
 
+/// Avatar circular do utilizador com fallback para iniciais quando não há foto.
 class ProfileAvatar extends StatelessWidget {
   final String name;
   final String photoUrl;

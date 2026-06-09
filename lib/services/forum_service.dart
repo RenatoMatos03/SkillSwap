@@ -4,9 +4,11 @@ import '../models/forum/comment_model.dart';
 import '../models/forum/school.dart';
 import '../models/forum/course.dart';
 
+/// Serviço de acesso ao fórum no Firestore: escolas, cursos, perguntas e comentários.
 class ForumService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  /// Devolve um stream com a lista de escolas ordenada por sigla.
   Stream<List<School>> getSchoolsStream() {
     return _db.collection('schools')
         .orderBy('acronym')
@@ -14,6 +16,7 @@ class ForumService {
         .map((snapshot) => snapshot.docs.map((doc) => School.fromMap(doc.data(), doc.id)).toList());
   }
 
+  /// Devolve um stream com os cursos de uma escola identificada pela sua sigla.
   Stream<List<Course>> getCoursesStream(String schoolAcronym) {
     return _db.collection('courses')
         .where('schoolAcronym', isEqualTo: schoolAcronym)
@@ -21,6 +24,7 @@ class ForumService {
         .map((snapshot) => snapshot.docs.map((doc) => Course.fromMap(doc.data(), doc.id)).toList());
   }
 
+  /// Cria uma nova pergunta e incrementa o contador de perguntas do curso.
   Future<void> createQuestion(Question question) async {
     final docRef = _db.collection('questions').doc();
     question.id = docRef.id;
@@ -34,6 +38,7 @@ class ForumService {
     }
   }
 
+  /// Devolve um stream com as perguntas de uma disciplina ordenadas por data.
   Stream<List<Question>> getQuestionsStream(String subjectName) {
     return _db.collection('questions')
         .where('subjectName', isEqualTo: subjectName)
@@ -45,16 +50,18 @@ class ForumService {
         });
   }
 
+  /// Adiciona um comentário raiz a uma pergunta e incrementa o contador.
   Future<void> addComment(String questionId, CommentModel comment) async {
     final docRef = _db.collection('questions').doc(questionId).collection('comments').doc();
-    comment.id = docRef.id; // Garante que tem o ID antes de guardar
+    comment.id = docRef.id;
     await docRef.set(comment.toMap());
-    
+
     await _db.collection('questions').doc(questionId).update({
       'commentsCount': FieldValue.increment(1)
     });
   }
 
+  /// Adiciona uma resposta aninhada a um comentário existente via arrayUnion.
   Future<void> addReply(String questionId, String commentId, CommentModel reply) async {
     await _db.collection('questions').doc(questionId)
         .collection('comments').doc(commentId)
@@ -63,6 +70,7 @@ class ForumService {
         });
   }
 
+  /// Devolve um stream com os comentários de uma pergunta ordenados por data.
   Stream<List<CommentModel>> getCommentsStream(String questionId) {
     return _db.collection('questions')
         .doc(questionId)
@@ -75,6 +83,7 @@ class ForumService {
         });
   }
 
+  /// Marca um comentário como solução, resolve a pergunta e recompensa o autor.
   Future<void> markAsSolution(String questionId, String commentId, String commentAuthorId) async {
     final batch = _db.batch();
 
@@ -89,9 +98,10 @@ class ForumService {
       batch.update(userRef, {'coins': FieldValue.increment(2)});
     }
 
-    await batch.commit(); 
+    await batch.commit();
   }
 
+  /// Atualiza os votos de um comentário raiz.
   Future<void> voteComment(String questionId, String commentId, int voteChange) async {
     final commentRef = _db.collection('questions').doc(questionId).collection('comments').doc(commentId);
     await commentRef.update({
@@ -99,20 +109,20 @@ class ForumService {
     });
   }
 
-  // NOVO: Função com transação para encontrar e atualizar votos num subcomentário dentro de um array
+  /// Atualiza os votos de uma resposta dentro de um array via transação.
   Future<void> voteReply(String questionId, String parentCommentId, String replyId, int voteChange) async {
     final commentRef = _db.collection('questions').doc(questionId).collection('comments').doc(parentCommentId);
-    
+
     await _db.runTransaction((transaction) async {
       final snapshot = await transaction.get(commentRef);
       if (!snapshot.exists) return;
-      
+
       final data = snapshot.data();
       if (data == null || data['replies'] == null) return;
-      
+
       List<dynamic> replies = data['replies'];
       List<Map<String, dynamic>> updatedReplies = [];
-      
+
       for (var r in replies) {
         Map<String, dynamic> replyMap = Map<String, dynamic>.from(r as Map);
         if (replyMap['id'] == replyId) {
@@ -120,11 +130,12 @@ class ForumService {
         }
         updatedReplies.add(replyMap);
       }
-      
+
       transaction.update(commentRef, {'replies': updatedReplies});
     });
   }
 
+  /// Elimina uma pergunta, os seus comentários e decrementa o contador do curso.
   Future<void> deleteQuestion(String questionId, String subjectName) async {
     final batch = _db.batch();
 

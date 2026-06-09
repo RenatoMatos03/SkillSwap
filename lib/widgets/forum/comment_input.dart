@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/forum/comment_model.dart';
 
+/// Campo de entrada de comentário ou resposta, com indicação do comentário ao qual se responde.
 class CommentInput extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -37,7 +38,7 @@ class CommentInput extends StatelessWidget {
                     const Icon(Icons.reply, size: 14, color: Color(0xFF009191)),
                     const SizedBox(width: 8),
                     Text(
-                      "A responder a ${replyingTo!.userName}", 
+                      "A responder a ${replyingTo!.userName}",
                       style: const TextStyle(color: Color(0xFF009191), fontWeight: FontWeight.bold, fontSize: 12)
                     ),
                     const Spacer(),
@@ -49,7 +50,6 @@ class CommentInput extends StatelessWidget {
                 ),
               ),
 
-            // --- CAIXA DE TEXTO ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
@@ -57,9 +57,8 @@ class CommentInput extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       controller: controller,
-                      focusNode: focusNode, 
+                      focusNode: focusNode,
                       decoration: InputDecoration(
-                        // Muda o texto dinamicamente consoante o estado
                         hintText: replyingTo != null ? "Escreve uma resposta..." : "Escreve um comentário na pergunta...",
                         hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
                         filled: true,

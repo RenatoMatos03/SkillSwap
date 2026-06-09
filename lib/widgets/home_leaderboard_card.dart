@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/home/home_models.dart';
 import '../theme/app_tokens.dart';
 
+/// Cartão de entrada do leaderboard na página inicial.
 class HomeLeaderboardCard extends StatelessWidget {
   final LeaderboardItem item;
   final VoidCallback onTap;
