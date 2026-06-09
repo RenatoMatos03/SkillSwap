@@ -1,6 +1,8 @@
 # SkillSwap
 
-**SkillSwap** é uma aplicação Flutter criada para apoiar a aprendizagem colaborativa entre estudantes. O projeto combina autenticação, um painel de notícias, fórum académico e um quiz educativo em uma experiência móvel moderna.
+> **Repositório:** https://github.com/RenatoMatos03/SkillSwap
+
+**SkillSwap** é uma aplicação móvel Flutter de aprendizagem colaborativa entre estudantes universitários. Combina um sistema de moedas virtuais, matchmaking por competências, fórum académico, quiz semanal e notificações em tempo real, com backend totalmente integrado no Firebase.
 
 ## Índice
 
@@ -10,112 +12,151 @@
 - [Tecnologias usadas](#tecnologias-usadas)
 - [Setup e execução](#setup-e-execução)
 - [Configuração Firebase](#configuração-firebase)
-- [Estado atual](#estado-atual)
 - [Estrutura de pastas](#estrutura-de-pastas)
+
+---
 
 ## Visão geral
 
-SkillSwap oferece um protótipo de plataforma para apoiar o intercâmbio de conhecimentos entre pares, com foco em estudantes do Instituto Politécnico de Setúbal (IPS). A app apresenta:
+SkillSwap permite que estudantes troquem conhecimento entre si: quem sabe ensina, quem precisa aprende — e as moedas virtuais servem de incentivo. A app foi desenvolvida para o Instituto Politécnico de Setúbal (IPS), com fóruns e cursos organizados por escola.
 
-- fluxo de autenticação com login, registo e verificação de email;
-- painel inicial com feed de notícias e leaderboard;
-- navegação por abas para fórum e quiz;
-- interface mobile com componentes reutilizáveis e navegação fluida.
+---
 
 ## Funcionalidades
 
 ### Autenticação
-
-- Login com email institucional e password
-- Registo com confirmação de password
-- Verificação de email via código OTP
-- Recuperação de password com validação de email
+- Registo com dados pessoais, escola, curso, ano e número de telemóvel
+- Login com email e password
+- Verificação de email obrigatória
+- Recuperação de password por email
 
 ### Home
+- Saudação personalizada com streak semanal
+- Carrossel de dicas de utilização da app
+- Leaderboard em tempo real (top 5 por moedas e por quizzes)
+- Menu lateral com acesso ao perfil, definições e Sobre Nós
+- Sino de notificações com badge de não lidas
 
-- Saudação personalizada ao utilizador
-- Carrossel de notícias com indicadores de página
-- Cards de leaderboard com estatísticas
-- Menu lateral com atalhos para perfil, histórico, definições e About Us
-- Barra de navegação inferior com suporte para Home, Match, Mensagens, Fórum e Quiz
+### Perfil
+- Visualização e edição de dados pessoais (nome, bio, escola, curso, ano, telemóvel)
+- Tags de oferta e procura de conhecimento
+- Estatísticas: moedas, quizzes realizados, avaliação
+- Avatares dinâmicos e foto de perfil
+- Opção de ocultar saldo de moedas no perfil
+- Modo anónimo por defeito configurável
+
+### Match (Swipe)
+- Visualização de perfis de outros estudantes por deslize
+- Matchmaking baseado em tags de oferta/procura
+
+### Mensagens
+- Lista de ligações estabelecidas
+- Abertura direta do WhatsApp com o contacto
+- Transferência de moedas com avaliação por estrelas
+- Visualização do perfil de outro utilizador (modo leitura)
 
 ### Fórum
+- Navegação por escolas e cursos do IPS
+- Publicação e resposta a dúvidas académicas com sistema de votos
+- Marcação de resposta como solução (recompensa 2 moedas ao autor)
+- Filtros e ordenação por curso e área temática
 
-- Seleção de escolas do IPS
-- Navegação para listas de cursos por escola
-- Layout preparado para evolução do fórum
+### Quiz Semanal
+- 10 perguntas de Informática via API externa
+- Bloqueio automático após conclusão — desbloqueia na segunda-feira seguinte
+- Ganho de 1 moeda por resposta certa
+- Ecrã de resultados com precisão e estatísticas detalhadas
 
-### Quiz
+### Notificações
+- Notificação em tempo real ao receber moedas
+- Notificação quando o quiz semanal fica disponível
+- Badge com contagem de não lidas; marcadas como lidas ao abrir
 
-- Tela de introdução ao quiz semanal
-- Informações de tempo, número de perguntas e nível
-- Início de quiz de exemplo com perguntas mock
+### Definições
+- Alteração de password
+- Toggle para mostrar/ocultar moedas no perfil (guardado por conta)
+- Toggle para modo anónimo por defeito
+- Terminar sessão
+- Eliminar conta
+
+---
 
 ## Arquitetura do projeto
 
-O projeto segue uma divisão modular para facilitar desenvolvimentos futuros:
+```
+lib/
+├── main.dart                  # Entrada da app e inicialização Firebase
+├── firebase_options.dart      # Configuração gerada pelo FlutterFire
+├── models/                    # Modelos de dados (UserProfile, quiz, fórum)
+├── services/                  # Lógica de negócio e acesso ao Firebase
+├── screens/                   # Ecrãs agrupados por domínio
+│   ├── auth/                  # Login, registo, verificação, recuperação
+│   ├── home/                  # Dashboard, definições, sobre nós
+│   ├── profile/               # Perfil e edição
+│   ├── swipe/                 # Matchmaking por deslize
+│   ├── messages/              # Ligações e transferência de moedas
+│   ├── forum/                 # Escolas, cursos, questões, detalhes
+│   └── quiz/                  # Ecrã inicial, perguntas, resultados
+├── widgets/                   # Componentes de UI reutilizáveis
+│   ├── forum/                 # Cards e componentes específicos do fórum
+│   ├── profile/               # Widgets de perfil
+│   └── quiz/                  # Widgets do quiz
+├── theme/                     # Tokens de cores e estilos globais
+└── utils/                     # Utilitários (strings, iniciais, etc.)
+```
 
-- `lib/main.dart` — entrada principal da app e inicialização do Firebase
-- `firebase_options.dart` — configuração gerada pelo FlutterFire para cada plataforma
-- `lib/screens/` — telas agrupadas por domínio de funcionalidade
-- `lib/services/` — lógica de negócio e integrações Firebase
-- `lib/widgets/` — componentes de UI reutilizáveis
-- `lib/theme/` — tokens de cores e estilos globais
-- `lib/models/` — definição de modelos de dados simples
+---
 
 ## Tecnologias usadas
 
-- Flutter 3 / Dart 3
-- Firebase Core
-- Firebase Authentication
-- Cloud Firestore
-- Cupertino Icons
-- Flutter Lints
+| Tecnologia | Uso |
+|---|---|
+| Flutter 3 / Dart 3 | Framework principal |
+| Firebase Authentication | Autenticação de utilizadores |
+| Cloud Firestore | Base de dados em tempo real |
+| Firebase Core | Inicialização Firebase |
+| url_launcher | Abertura do WhatsApp |
+| flutter_lints | Análise estática de código |
+
+---
 
 ## Setup e execução
 
 ### Pré-requisitos
 
-- Flutter instalado e configurado no sistema
-- Android Studio ou VS Code com Flutter plugin
-- Emulador ou dispositivo físico configurado
+- Flutter SDK instalado e no PATH
+- Android Studio ou VS Code com o plugin Flutter
+- Emulador Android/iOS ou dispositivo físico
 
 ### Passos
 
-```powershell
+```bash
+git clone https://github.com/RenatoMatos03/SkillSwap
+cd SkillSwap
 flutter pub get
 flutter run
 ```
 
 ### Comandos úteis
 
-- `flutter analyze` — análise de código
-- `flutter pub outdated` — verificar dependências desatualizadas
+```bash
+flutter analyze          # Análise estática de código
+flutter pub outdated     # Verificar dependências desatualizadas
+flutter build apk        # Gerar APK Android
+```
+
+---
 
 ## Configuração Firebase
 
-O projeto inclui a configuração básica do Firebase via `firebase_options.dart`. Para reproduzir o ambiente localmente, verifique:
+O projeto requer os seguintes ficheiros de configuração Firebase (não incluídos no repositório por segurança):
 
-- `android/app/google-services.json`
-- `ios/Runner/GoogleService-Info.plist`
-- `lib/firebase_options.dart`
+| Plataforma | Ficheiro |
+|---|---|
+| Android | `android/app/google-services.json` |
+| iOS | `ios/Runner/GoogleService-Info.plist` |
+| Dart | `lib/firebase_options.dart` |
 
-## Estado atual
-
-- Interface de login e registo implementada
-- Verificação de email com código OTP disponível
-- Recuperação de password com validação de email implementada
-- Feed de notícias e leaderboard baseados em dados mock
-- Menu lateral e navegação inferior construídos
-- Algumas funcionalidades ainda são placeholders e exibem mensagens informativas
-
-## Estrutura de pastas
-
-- `lib/screens/auth/` — autenticação e fluxo de onboarding
-- `lib/screens/home/` — dashboard principal e navegação home
-- `lib/screens/forum/` — seleção de escolas e cursos do fórum
-- `lib/screens/quiz/` — fluxo de quiz educativo
-- `lib/services/` — serviços de integração com Firebase
-- `lib/widgets/` — componentes de UI reutilizáveis
-- `lib/theme/` — definições de estilo e cores
-- `lib/models/` — modelos de dados para componentes
+```bash
+flutterfire configure
+```
